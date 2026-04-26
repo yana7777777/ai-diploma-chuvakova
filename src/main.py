@@ -1,12 +1,8 @@
-from json_utils import save_json, load_json, dict_to_json_text
+from text_utils import normalize_text, word_count, contains_word
 
-config = {
-    "model": "demo",
-    "temperature": 0.7,
-    "max_tokens": 200
-}
+text = "  Today is the holiday of bright Easter!  "
 
-save_json("config.json", config)
-
-print(load_json("config.json"))
-print(dict_to_json_text(config))
+print(normalize_text(text))
+print(word_count(text))
+print(contains_word(text, "of"))
+print(len(text))
