@@ -40,7 +40,12 @@ def run_project_scenario():
         {"id": 1, "name": "Иван","surname": "Петров", "city": "Самара", "age": 40},
         {"id": 2, "name": "Соня","surname": "Иванова", "city": "Москва", "age": 30},
         {"id": 3, "name": "Игорь","surname": "Сидоров", "city": "Казань", "age": 50},
-        {"id": 4, "name": "Стас","surname": "Лавров", "city": "Самара", "age": 58}
+        {"id": 4, "name": "Стас","surname": "Лавров", "city": "Самара", "age": 58},
+        {"id": 5, "name": "Анжела","surname": "Самойлова", "city": "Самара", "age": 55},
+        {"id": 6, "name": "Кирилл","surname": "Птичкин", "city": "Самара", "age": 53},
+        {"id": 7, "name": "Юрий","surname": "Чуракин", "city": "Самара", "age": 58},
+        {"id": 8, "name": "Григорий","surname": "Шумаков", "city": "Самара", "age": 62}
+
     ]
 
     # 2. Работа с текстом и данными
@@ -57,18 +62,21 @@ def run_project_scenario():
     note_lines = count_lines("project_note.txt")
 
     # 4. Работа с CSV
+    
     rows = [
-        ["title", "price", "count"],
-        ["Груши", 300, 5],
-        ["Манго", 600, 5],
-        ["Мандарины", 200, 10],
-        ["Слива", 100, 10]
-    ]
+    ["статья", "дебет", "кредит", "сальдо", "период", "валюта"],
+    ["Основные средства", 500000, 0, 500000, "2024", "RUB"],
+    ["Расчетный счет", 320000, 0, 320000, "2024", "RUB"],
+    ["Поставщики", 0, 180000, -180000, "2024", "RUB"],
+    ["Выручка", 0, 2150000, -2150000, "2024", "RUB"],
+    ["Себестоимость", 1250000, 0, 1250000, "2024", "RUB"],
+    ["Чистая прибыль", 0, 500000, -500000, "2024", "RUB"]
+]
 
-    save_csv("products.csv", rows)
-    loaded_products = load_csv("products.csv")
-    product_rows = count_csv_rows("products.csv")
-    total_price = sum_column("products.csv", 1)
+    save_csv("finance.csv", rows)
+    loaded_finance = load_csv("finance.csv")
+    finance_rows = count_csv_rows("finance.csv")
+    total_finance = sum_column("finance.csv", 3)
 
     # 5. Работа с JSON
     project_config = {
@@ -76,7 +84,7 @@ def run_project_scenario():
         "task_count": report["task_count"],
         "users_count": report["users_count"],
         "note_lines": note_lines,
-        "product_rows": product_rows
+        "finance_rows": finance_rows
     }
 
     save_json("project_config.json", project_config)
@@ -94,7 +102,7 @@ def run_project_scenario():
 
     print("2. Данные студентов:")
     print("Найден студент Иван:", found_user)
-    print("Студенты из Казани:", samara_users)
+    print("Студенты из Самары:", samara_users)
     print("Количество студентов:", report["users_count"])
     print()
 
@@ -105,9 +113,9 @@ def run_project_scenario():
     print()
 
     print("4. CSV:")
-    print("Данные products.csv:", loaded_products)
-    print("Количество строк в CSV:", product_rows)
-    print("Сумма столбца price:", total_price)
+    print("Данные finance.csv:", loaded_finance)
+    print("Количество строк в CSV:", finance_rows)
+    print("Сумма столбца сальдо:", total_finance)
     print()
 
     print("5. JSON:")
