@@ -60,7 +60,10 @@ print("\n".join(map(str, students)))
 assert len(students) >= 3
 
 for student in students:
-    print("ID:", student[0], "| Имя:", student[1], "| Город:", student[2], "| Возраст:", student[3])
+    print("ID:", student[0], "| Имя:", student[1], "| Фамилия:", student[2], 
+      "| Город:", student[3], "| Возраст:", student[4], "| Курс:", student[5])
+
+
 
 cursor.execute(
     "SELECT * FROM students WHERE city = ?",
@@ -78,4 +81,3 @@ assert len(moskva_students) >= 1
 connection.close()
 
 print("Соединение с базой данных закрыто")
-
