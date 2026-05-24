@@ -10,3 +10,24 @@
 
 # print("Cursor создан")
 
+
+# connection.commit()
+# print("Таблица students создана")
+
+# connection.commit()
+# print("Изменения сохранены")
+
+# cursor.execute("SELECT * FROM students")
+
+# students = cursor.fetchall()
+
+# print("\n".join(map(str, students)))
+
+# assert len(students) >= 3
+
+
+
+# connection.close()
+
+# print("Соединение с базой данных закрыто")
+

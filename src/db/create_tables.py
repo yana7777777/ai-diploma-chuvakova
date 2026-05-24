@@ -52,3 +52,20 @@
 # print("\n".join(map(str, students)))
 
 # assert len(students) >= 3
+
+# for student in students:
+#     print("ID:", student[0], "| Имя:", student[1], "| Город:", student[2], "| Возраст:", student[3])
+
+
+# cursor.execute(
+#     "SELECT * FROM students WHERE city = ?",
+#     ("Москва",)
+# )
+
+# moskva_students = cursor.fetchall()
+
+# print("\n".join(map(str, moskva_students)))
+# print(moskva_students)
+
+# assert len(moskva_students) >= 1
+
