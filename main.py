@@ -1,132 +1,101 @@
 import sqlite3
 
-connection = sqlite3.connect("user_lesson02.db")
+connection = sqlite3.connect("user_lesson03.db")
 cursor = connection.cursor()
 
-print("База данных подключена")
+print("База подключена")
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS employees (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    name TEXT,
-    surname TEXT,
-    city TEXT,
-    age INTEGER,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    position TEXT NOT NULL,
+    department TEXT,
+    salary INTEGER,
+    hire_date DATE,
     email TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    role TEXT DEFAULT 'user',
+    phone TEXT,
+    city TEXT,
+    experience_years INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'active',
     is_active INTEGER DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-
-
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
 
 connection.commit()
+print("Таблица employees создана (13 полей)")
 
-print("Таблица users создана")
+cursor.execute("DELETE FROM employees")
 
-cursor.execute("DELETE FROM users")
+connection.commit()
 
-users_data = [
-    ("alex_smith", "Алексей", "Смит", "Москва", 25, "alex@example.com", "hash_pass_123", "admin", 1),
-    ("elena_petrova", "Елена", "Петрова", "Санкт-Петербург", 30, "elena@example.com", "hash_pass_456", "user", 1),
-    ("ivan_koval", "Иван", "Коваль", "Киев", 28, "ivan@example.com", "hash_pass_789", "user", 1),
-    ("maria_volkova", "Мария", "Волкова", "Минск", 22, "maria@example.com", "hash_pass_abc", "moderator", 1),
-    ("dmitry_zhuk", "Дмитрий", "Жук", "Москва", 35, "dmitry@example.com", "hash_pass_def", "user", 0),
-    ("olga_sokol", "Ольга", "Сокол", "Санкт-Петербург", 27, "olga@example.com", "hash_pass_ghi", "user", 1),
-    ("pavel_moroz", "Павел", "Мороз", "Новосибирск", 29, "pavel@example.com", "hash_pass_jkl", "user", 1),
-    ("nata_kuzmin", "Наталья", "Кузьмина", "Екатеринбург", 26, "nata@example.com", "hash_pass_mno", "user", 1)
+print("Таблица очищена")
+
+employees = [
+    ("Иван", "Петров", "Разработчик", "IT", 120000, "2020-01-15", "ivan@company.com", "+79123456789", "Москва", 5, "active", 1),
+    ("Елена", "Сидорова", "Менеджер", "Продажи", 95000, "2019-03-10", "elena@company.com", "+79234567890", "СПб", 7, "active", 1),
+    ("Алексей", "Козлов", "Тестировщик", "QA", 80000, "2021-06-20", "alexey@company.com", "+79345678901", "Новосибирск", 3, "active", 1)
 ]
 
 cursor.executemany("""
-INSERT INTO users (username, name, surname, city, age, email, password_hash, role, is_active)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-""", users_data)
+    INSERT INTO employees (first_name, last_name, position, department, salary, hire_date, email, phone, city, experience_years, status, is_active)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+""", employees)
 
 connection.commit()
-print(f"Таблица users создана и заполнена {len(users_data)} строками")
+print(f"Добавлено {len(employees)} сотрудников")
 
-cursor.execute("SELECT * FROM users")
+cursor.execute("SELECT * FROM employees")
 
-all_users = cursor.fetchall()
+employees_data = cursor.fetchall()
 
-for product in all_users:
-    print(product)
+for employee in employees_data:
+    print(employee)
 
-assert len(all_users) == 8
-
-cursor.execute("SELECT username, role FROM users")
-
-users_and_role = cursor.fetchall()
-
-for row in users_and_role:
-    print(row)
-
-assert len(users_and_role) == 8
+assert len(employees_data) == 3
 
 cursor.execute(
-    "SELECT * FROM users WHERE age > ?",
-    (27,)
+    "UPDATE employees SET position = ? WHERE first_name = ?",
+    ("Коммерческий директор", "Елена")
 )
 
-more_users = cursor.fetchall()
+connection.commit()
 
-for user in more_users:
-    print(user)
+print("Должность обновлена")
 
-assert len(more_users) >= 4
+cursor.execute(
+    "SELECT * FROM employees WHERE first_name = ?",
+    ("Елена",)
+)
+
+elena = cursor.fetchone()
+print(elena)
+
+# Проверяем, что должность соответствует ожидаемой
+assert elena[3] == "Коммерческий директор"  # position на индексе 3 (или проверьте индекс)
+print("Assert пройден!")
 
 
 cursor.execute(
-    "SELECT * FROM users WHERE role = ?",
-    ("admin",)
+    "DELETE FROM employees WHERE first_name = ?",
+    ("Елена",)
 )
 
-role_users = cursor.fetchall()
+connection.commit()
 
-for user in role_users:
-    print(user)
+print("Запись удалена")
 
-assert len(role_users) == 1
+cursor.execute("SELECT * FROM employees")
 
-cursor.execute(
-    "SELECT * FROM users WHERE city = ? AND age >= ?",
-    ("Киев", 28)
-)
+employees_after_delete = cursor.fetchall()
 
-filtered_and = cursor.fetchall()
+for employee in employees_after_delete:
+    print(employee)
 
-print("Пользователь с возростом равным или больше 28")
-for user in filtered_and:
-    print(user)
-
-cursor.execute(
-    "SELECT * FROM users WHERE username = ? OR role = ?",
-    ("maria_volkova", "moderator")
-)
-
-filtered_or = cursor.fetchall()
-
-print("\nАктивность пользователя:")
-for user in filtered_or:
-    print(user)
-
-assert len(filtered_and) >= 1
-assert len(filtered_or) >= 1
-
-cursor.execute(
-    "SELECT * FROM users ORDER BY age DESC LIMIT 3"
-)
-
-top_age = cursor.fetchall()
-
-for user in top_age:
-    print(user)
-
-assert len(top_age) == 3
+assert len(employees_after_delete) == 2
 
 connection.close()
+
 print("Соединение закрыто")
