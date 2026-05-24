@@ -1,83 +1,132 @@
 import sqlite3
 
-print("sqlite3 успешно подключен")
-
-connection = sqlite3.connect("students_lesson01.db")
-
-print("База данных создана или открыта")
-
+connection = sqlite3.connect("user_lesson02.db")
 cursor = connection.cursor()
 
-print("Cursor создан")
+print("База данных подключена")
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS students (
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
+    username TEXT NOT NULL UNIQUE,
+    name TEXT,
+    surname TEXT,
     city TEXT,
     age INTEGER,
-    course INTEGER,
-    faculty TEXT,
-    email TEXT UNIQUE,
-    phone TEXT,
-    gpa REAL DEFAULT 0.0
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role TEXT DEFAULT 'user',
+    is_active INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+
 )
 """)
 
 connection.commit()
-print("Таблица students создана")
 
-cursor.execute("DELETE FROM students")
-connection.commit()
+print("Таблица users создана")
 
+cursor.execute("DELETE FROM users")
 
-students_data = [
-    ("Анна", "Иванова", "Москва", 19, 2, "Информатика", "anna@student.com", "+79111111111", 4.8),
-    ("Максим", "Петров", "СПб", 20, 3, "Математика", "maxim@student.com", "+79222222222", 4.5),
-    ("Дарья", "Сидорова", "Киев", 18, 1, "Физика", "darya@student.com", "+79333333333", 4.9),
-    ("Артем", "Козлов", "Минск", 21, 4, "Информатика", "artem@student.com", "+79444444444", 4.2),
-    ("Екатерина", "Морозова", "Москва", 19, 2, "Экономика", "ekaterina@student.com", "+79555555555", 4.7)
+users_data = [
+    ("alex_smith", "Алексей", "Смит", "Москва", 25, "alex@example.com", "hash_pass_123", "admin", 1),
+    ("elena_petrova", "Елена", "Петрова", "Санкт-Петербург", 30, "elena@example.com", "hash_pass_456", "user", 1),
+    ("ivan_koval", "Иван", "Коваль", "Киев", 28, "ivan@example.com", "hash_pass_789", "user", 1),
+    ("maria_volkova", "Мария", "Волкова", "Минск", 22, "maria@example.com", "hash_pass_abc", "moderator", 1),
+    ("dmitry_zhuk", "Дмитрий", "Жук", "Москва", 35, "dmitry@example.com", "hash_pass_def", "user", 0),
+    ("olga_sokol", "Ольга", "Сокол", "Санкт-Петербург", 27, "olga@example.com", "hash_pass_ghi", "user", 1),
+    ("pavel_moroz", "Павел", "Мороз", "Новосибирск", 29, "pavel@example.com", "hash_pass_jkl", "user", 1),
+    ("nata_kuzmin", "Наталья", "Кузьмина", "Екатеринбург", 26, "nata@example.com", "hash_pass_mno", "user", 1)
 ]
 
 cursor.executemany("""
-INSERT INTO students (first_name, last_name, city, age, course, faculty, email, phone, gpa)
+INSERT INTO users (username, name, surname, city, age, email, password_hash, role, is_active)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-""", students_data)
-
-
-print(f"Добавлено {len(students_data)} студентов")
+""", users_data)
 
 connection.commit()
-print("Изменения сохранены")
+print(f"Таблица users создана и заполнена {len(users_data)} строками")
 
-cursor.execute("SELECT * FROM students")
+cursor.execute("SELECT * FROM users")
 
-students = cursor.fetchall()
+all_users = cursor.fetchall()
 
-print("\n".join(map(str, students)))
+for product in all_users:
+    print(product)
 
-assert len(students) >= 3
+assert len(all_users) == 8
 
-for student in students:
-    print("ID:", student[0], "| Имя:", student[1], "| Фамилия:", student[2], 
-      "| Город:", student[3], "| Возраст:", student[4], "| Курс:", student[5])
+cursor.execute("SELECT username, role FROM users")
 
+users_and_role = cursor.fetchall()
+
+for row in users_and_role:
+    print(row)
+
+assert len(users_and_role) == 8
+
+cursor.execute(
+    "SELECT * FROM users WHERE age > ?",
+    (27,)
+)
+
+more_users = cursor.fetchall()
+
+for user in more_users:
+    print(user)
+
+assert len(more_users) >= 4
 
 
 cursor.execute(
-    "SELECT * FROM students WHERE city = ?",
-    ("Москва",)
+    "SELECT * FROM users WHERE role = ?",
+    ("admin",)
 )
 
-moskva_students = cursor.fetchall()
+role_users = cursor.fetchall()
 
-print("\n".join(map(str, moskva_students)))
-print(moskva_students)
+for user in role_users:
+    print(user)
 
-assert len(moskva_students) >= 1
+assert len(role_users) == 1
 
+cursor.execute(
+    "SELECT * FROM users WHERE city = ? AND age >= ?",
+    ("Киев", 28)
+)
+
+filtered_and = cursor.fetchall()
+
+print("Пользователь с возростом равным или больше 28")
+for user in filtered_and:
+    print(user)
+
+cursor.execute(
+    "SELECT * FROM users WHERE username = ? OR role = ?",
+    ("maria_volkova", "moderator")
+)
+
+filtered_or = cursor.fetchall()
+
+print("\nАктивность пользователя:")
+for user in filtered_or:
+    print(user)
+
+assert len(filtered_and) >= 1
+assert len(filtered_or) >= 1
+
+cursor.execute(
+    "SELECT * FROM users ORDER BY age DESC LIMIT 3"
+)
+
+top_age = cursor.fetchall()
+
+for user in top_age:
+    print(user)
+
+assert len(top_age) == 3
 
 connection.close()
-
-print("Соединение с базой данных закрыто")
+print("Соединение закрыто")
