@@ -1,135 +1,81 @@
-from text_utils import normalize_text, word_count, contains_word
-from data_utils import find_by_name, filter_by_value, count_items
-from file_utils import save_text, load_text, append_text, count_lines
-from csv_utils import save_csv, load_csv, count_csv_rows, sum_column
-from json_utils import save_json, load_json, dict_to_json_text
+import sqlite3
+
+print("sqlite3 успешно подключен")
+
+connection = sqlite3.connect("students_lesson01.db")
+
+print("База данных создана или открыта")
+
+cursor = connection.cursor()
+
+print("Cursor создан")
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS students (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    city TEXT,
+    age INTEGER,
+    course INTEGER,
+    faculty TEXT,
+    email TEXT UNIQUE,
+    phone TEXT,
+    gpa REAL DEFAULT 0.0
+)
+""")
+
+connection.commit()
+print("Таблица students создана")
+
+cursor.execute("DELETE FROM students")
+connection.commit()
 
 
-def build_project_report(text, tasks, users):
-    clean_text = normalize_text(text)
-    words = word_count(clean_text)
-    has_python = contains_word(clean_text, "python")
-    task_count = count_items(tasks)
-    users_count = count_items(users)
-
-    report = {
-        "clean_text": clean_text,
-        "word_count": words,
-        "has_python": has_python,
-        "task_count": task_count,
-        "users_count": users_count
-    }
-
-    return report
-
-
-def run_project_scenario():
-    # 1. Исходные данные проекта
-    text = "   Мой первый проект на Python   "
-
-    tasks = [
-        "изучить строки",
-        "изучить списки словарей",
-        "изучить файлы",
-        "изучить CSV",
-        "изучить JSON",
-        "собрать проект"
-    ]
-
-    users = [
-        {"id": 1, "name": "Иван","surname": "Петров", "city": "Самара", "age": 40},
-        {"id": 2, "name": "Соня","surname": "Иванова", "city": "Москва", "age": 30},
-        {"id": 3, "name": "Игорь","surname": "Сидоров", "city": "Казань", "age": 50},
-        {"id": 4, "name": "Стас","surname": "Лавров", "city": "Самара", "age": 58},
-        {"id": 5, "name": "Анжела","surname": "Самойлова", "city": "Самара", "age": 55},
-        {"id": 6, "name": "Кирилл","surname": "Птичкин", "city": "Самара", "age": 53},
-        {"id": 7, "name": "Юрий","surname": "Чуракин", "city": "Самара", "age": 58},
-        {"id": 8, "name": "Григорий","surname": "Шумаков", "city": "Самара", "age": 62}
-
-    ]
-
-    # 2. Работа с текстом и данными
-    report = build_project_report(text, tasks, users)
-
-    found_user = find_by_name(users, "Иван")
-    samara_users = filter_by_value(users, "city", "Самара")
-
-    # 3. Работа с текстовым файлом
-    save_text("project_note.txt", report["clean_text"])
-    append_text("project_note.txt", "Проект собран из нескольких модулей.")
-
-    loaded_note = load_text("project_note.txt")
-    note_lines = count_lines("project_note.txt")
-
-    # 4. Работа с CSV
-    
-    rows = [
-    ["статья", "дебет", "кредит", "сальдо", "период", "валюта"],
-    ["Основные средства", 500000, 0, 500000, "2024", "RUB"],
-    ["Расчетный счет", 320000, 0, 320000, "2024", "RUB"],
-    ["Поставщики", 0, 180000, -180000, "2024", "RUB"],
-    ["Выручка", 0, 2150000, -2150000, "2024", "RUB"],
-    ["Себестоимость", 1250000, 0, 1250000, "2024", "RUB"],
-    ["Чистая прибыль", 0, 500000, -500000, "2024", "RUB"]
+students_data = [
+    ("Анна", "Иванова", "Москва", 19, 2, "Информатика", "anna@student.com", "+79111111111", 4.8),
+    ("Максим", "Петров", "СПб", 20, 3, "Математика", "maxim@student.com", "+79222222222", 4.5),
+    ("Дарья", "Сидорова", "Киев", 18, 1, "Физика", "darya@student.com", "+79333333333", 4.9),
+    ("Артем", "Козлов", "Минск", 21, 4, "Информатика", "artem@student.com", "+79444444444", 4.2),
+    ("Екатерина", "Морозова", "Москва", 19, 2, "Экономика", "ekaterina@student.com", "+79555555555", 4.7)
 ]
 
-    save_csv("finance.csv", rows)
-    loaded_finance = load_csv("finance.csv")
-    finance_rows = count_csv_rows("finance.csv")
-    total_finance = sum_column("finance.csv", 3)
-
-    # 5. Работа с JSON
-    project_config = {
-        "project_name": "user_final_project",
-        "task_count": report["task_count"],
-        "users_count": report["users_count"],
-        "note_lines": note_lines,
-        "finance_rows": finance_rows
-    }
-
-    save_json("project_config.json", project_config)
-    loaded_config = load_json("project_config.json")
-    config_text = dict_to_json_text(loaded_config)
-
-    # 6. Вывод результата
-    print("=== Финальный учебный проект ===")
-    print()
-    print("1. Текст:")
-    print("Очищенный текст:", report["clean_text"])
-    print("Количество слов:", report["word_count"])
-    print("Есть слово python:", report["has_python"])
-    print()
-
-    print("2. Данные студентов:")
-    print("Найден студент Иван:", found_user)
-    print("Студенты из Самары:", samara_users)
-    print("Количество студентов:", report["users_count"])
-    print()
-
-    print("3. Текстовый файл:")
-    print("Содержимое project_note.txt:")
-    print(loaded_note)
-    print("Количество строк:", note_lines)
-    print()
-
-    print("4. CSV:")
-    print("Данные finance.csv:", loaded_finance)
-    print("Количество строк в CSV:", finance_rows)
-    print("Сумма столбца сальдо:", total_finance)
-    print()
-
-    print("5. JSON:")
-    print("Загруженная конфигурация:", loaded_config)
-    print("JSON-текст:")
-    print(config_text)
-    print()
-
-    print("Проект успешно запущен.")
+cursor.executemany("""
+INSERT INTO students (first_name, last_name, city, age, course, faculty, email, phone, gpa)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+""", students_data)
 
 
-def main():
-    run_project_scenario()
+print(f"Добавлено {len(students_data)} студентов")
+
+connection.commit()
+print("Изменения сохранены")
+
+cursor.execute("SELECT * FROM students")
+
+students = cursor.fetchall()
+
+print("\n".join(map(str, students)))
+
+assert len(students) >= 3
+
+for student in students:
+    print("ID:", student[0], "| Имя:", student[1], "| Город:", student[2], "| Возраст:", student[3])
+
+cursor.execute(
+    "SELECT * FROM students WHERE city = ?",
+    ("Москва",)
+)
+
+moskva_students = cursor.fetchall()
+
+print("\n".join(map(str, moskva_students)))
+print(moskva_students)
+
+assert len(moskva_students) >= 1
 
 
-if __name__ == "__main__":
-    main()
+connection.close()
+
+print("Соединение с базой данных закрыто")
+
