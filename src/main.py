@@ -1,149 +1,85 @@
 import sqlite3
 
-connection = sqlite3.connect("join_lesson06.db")
+connection = sqlite3.connect("analytics_lesson07.db")
 cursor = connection.cursor()
-
-cursor.execute("PRAGMA foreign_keys = ON")
 
 print("База данных подключена")
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS employees (
+CREATE TABLE IF NOT EXISTS sales_spare_parts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    department TEXT,
-    position TEXT
+    product TEXT,
+    category TEXT,
+    article TEXT,
+    city TEXT,
+    quantity INTEGER,
+    price INTEGER,
+    revenue INTEGER
 )
 """)
 
 connection.commit()
 
-print("Таблица employees создана")
+print("Таблица sales_spare_parts создана")
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS work_records (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    employee_id INTEGER,
-    department TEXT,
-    position TEXT,
-    task_title TEXT,
-    hours INTEGER
-)
-""")
+cursor.execute("DELETE FROM sales_spare_parts")
 
-connection.commit()
-
-print("Таблица work_records создана")
-
-cursor.execute("DELETE FROM employees")
-cursor.execute("DELETE FROM work_records")
-
-employees = [
-    (1, "Анна", "Бухгалтерия", "главный бухгалтер"),
-    (2, "Иван", "Отдел продаж", "менеджер"),
-    (3, "Галя", "Отдел продаж", "Руководитель продаж"),
-    (4, "Наташа", "Бухгалтерия", "бухгалтер")
-
+sales_spare_parts = [
+    ("Шланг подвода химии ф13", "Шланги", "100021", "Самара", 3, 20000, 60000),
+    ("Шланг подвода химии ф19", "Шланги", "100022", "Самара", 2, 15000, 30000),
+    ("Навивка защитная", "Шланги", "100024", "Самара", 3, 10000, 30000),
+    ("Штуцер 1*", "Фитинги", "100044", "Самара", 4, 10000, 40000),
+    ("Ниппель ф25 р/в", "Фитинги", "100048", "Самара", 3, 20000, 60000),
+    ("Тройник 1*", "Фитинги", "100056", "Самара", 4, 15000, 60000),
+    ("Шланг подвода химии ф13", "Шланги", "100021", "Москва", 5, 20000, 100000),
+    ("Ниппель ф25 р/в", "Фитинги", "100048", "Москва", 2, 20000, 40000),
+    ("Тройник 1*", "Фитинги", "100056", "СПб", 3, 15000, 45000),
+    ("Штуцер 1*", "Фитинги", "100044", "Казань", 6, 10000, 60000)
 ]
 
 cursor.executemany(
-    "INSERT INTO employees (id, name, department, position) VALUES (?, ?, ?, ?)",
-    employees
+    "INSERT INTO sales_spare_parts (product, category, article, city, quantity, price, revenue) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    sales_spare_parts
 )
 
 connection.commit()
+print("Таблица очищена и заполнена 10 уникальными записями")
 
-print("Сотрудники добавлены")
+cursor.execute("SELECT COUNT(*) FROM sales_spare_parts")
+count = cursor.fetchone()[0]
+print(f"Количество записей: {count}")
+assert count >= 10
 
-cursor.execute("SELECT * FROM employees")
-employees_data = cursor.fetchall()
+cursor.execute("SELECT SUM(revenue) FROM sales_spare_parts")
+total_revenue = cursor.fetchone()[0]
+print(f"Общая выручка: {total_revenue}")
+assert total_revenue > 0
 
-for employee in employees_data:
-    print(employee)
+cursor.execute("SELECT AVG(price), MIN(price), MAX(price) FROM sales_spare_parts")
+avg_price, min_price, max_price = cursor.fetchone()
+print(f"Средняя цена: {avg_price}, Мин: {min_price}, Макс: {max_price}")
+assert max_price >= min_price
 
-anna_id = employees_data[0][0]
-ivan_id = employees_data[1][0]
-galya_id = employees_data[2][0]
-
-work_records = [
-    (anna_id, "Составить отчёт", 10),
-    (anna_id, "Проверить счета", 5),
-    (ivan_id, "Позвонить клиентам", 8),
-    (galya_id, "Провести планёрку", 2)
-]
-
-cursor.executemany(
-    "INSERT INTO work_records (employee_id, task_title, hours) VALUES (?, ?, ?)",
-    work_records
-)
-
-connection.commit()
-
-print("Рабочие записи добавлены")
-
-
-cursor.execute("SELECT * FROM employees")
-employees_rows = cursor.fetchall()
-
-cursor.execute("SELECT * FROM work_records")
-work_records_rows = cursor.fetchall()
-
-for row in employees_rows:
-    print(row)
-
-for row in work_records_rows:
-    print(row)
-
-assert len(employees_rows) >= 3
-assert len(work_records_rows) >= 3
-
-cursor.execute("""
-SELECT * FROM employees
-INNER JOIN work_records ON employees.id = work_records.employee_id
-""")
+cursor.execute("SELECT category, SUM(revenue) FROM sales_spare_parts GROUP BY category")
 result = cursor.fetchall()
-
 for row in result:
-    print(row)
+    print(f"Категория: {row[0]}, Общая выручка: {row[1]}")
+assert len(result) >= 1
 
-assert len(result) > 0
-
-cursor.execute("""
-SELECT * FROM employees
-INNER JOIN work_records ON employees.id = work_records.employee_id
-WHERE employees.department = 'Отдел продаж'
-""")
+cursor.execute("SELECT category, COUNT(*), SUM(revenue), AVG(price) FROM sales_spare_parts GROUP BY category")
 result = cursor.fetchall()
-
 for row in result:
-    print(row)
+    print(f"Категория: {row[0]}, Кол-во: {row[1]}, Общая выручка: {row[2]}, Средняя цена: {row[3]}")
 
-cursor.execute("""
-SELECT * FROM employees
-LEFT JOIN work_records ON employees.id = work_records.employee_id
-""")
+cursor.execute("SELECT category, SUM(revenue) AS total FROM sales_spare_parts GROUP BY category ORDER BY total DESC")
 result = cursor.fetchall()
-
 for row in result:
-    print(row)
+    print(f"Категория: {row[0]}, Общая выручка: {row[1]}")
+assert len(result) >= 1
 
-assert len(result) >= len(employees_rows)
-
-cursor.execute("""
-SELECT employees.name, COUNT(work_records.id) as task_count
-FROM employees
-LEFT JOIN work_records ON employees.id = work_records.employee_id
-GROUP BY employees.id
-""")
+cursor.execute("SELECT category, SUM(revenue) FROM sales_spare_parts GROUP BY category HAVING SUM(revenue) > 100000")
 result = cursor.fetchall()
-
-print("Отчёт: количество задач по сотрудникам")
 for row in result:
-    print(f"Сотрудник: {row[0]}, задач: {row[1]}")
-
-assert len(result) > 0
-
+    print(f"Категория: {row[0]}, Общая выручка: {row[1]}")
+assert len(result) >= 0
 connection.close()
-
-
-
