@@ -1,85 +1,146 @@
 import sqlite3
 
-connection = sqlite3.connect("analytics_lesson07.db")
-cursor = connection.cursor()
+print("sqlite3 подключен")
 
-print("База данных подключена")
+def get_connection(db_name="python_sql_lesson08.db"):
+    connection = sqlite3.connect(db_name)
+    return connection
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS sales_spare_parts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    product TEXT,
-    category TEXT,
-    article TEXT,
-    city TEXT,
-    quantity INTEGER,
-    price INTEGER,
-    revenue INTEGER
-)
-""")
+connection = get_connection()
 
-connection.commit()
+print("Подключение создано")
 
-print("Таблица sales_spare_parts создана")
+assert connection is not None
 
-cursor.execute("DELETE FROM sales_spare_parts")
 
-sales_spare_parts = [
-    ("Шланг подвода химии ф13", "Шланги", "100021", "Самара", 3, 20000, 60000),
-    ("Шланг подвода химии ф19", "Шланги", "100022", "Самара", 2, 15000, 30000),
-    ("Навивка защитная", "Шланги", "100024", "Самара", 3, 10000, 30000),
-    ("Штуцер 1*", "Фитинги", "100044", "Самара", 4, 10000, 40000),
-    ("Ниппель ф25 р/в", "Фитинги", "100048", "Самара", 3, 20000, 60000),
-    ("Тройник 1*", "Фитинги", "100056", "Самара", 4, 15000, 60000),
-    ("Шланг подвода химии ф13", "Шланги", "100021", "Москва", 5, 20000, 100000),
-    ("Ниппель ф25 р/в", "Фитинги", "100048", "Москва", 2, 20000, 40000),
-    ("Тройник 1*", "Фитинги", "100056", "СПб", 3, 15000, 45000),
-    ("Штуцер 1*", "Фитинги", "100044", "Казань", 6, 10000, 60000)
-]
+def create_employees_table(connection):
+  cursor = connection.cursor()
+  cursor.execute("""
+  CREATE TABLE IF NOT EXISTS employees (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      department TEXT,
+      position TEXT
+  )
+  """)
 
-cursor.executemany(
-    "INSERT INTO sales_spare_parts (product, category, article, city, quantity, price, revenue) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    sales_spare_parts
-)
+  connection.commit()
 
-connection.commit()
-print("Таблица очищена и заполнена 10 уникальными записями")
+create_employees_table(connection)
 
-cursor.execute("SELECT COUNT(*) FROM sales_spare_parts")
-count = cursor.fetchone()[0]
-print(f"Количество записей: {count}")
-assert count >= 10
+print("Таблица employees создана")
 
-cursor.execute("SELECT SUM(revenue) FROM sales_spare_parts")
-total_revenue = cursor.fetchone()[0]
-print(f"Общая выручка: {total_revenue}")
-assert total_revenue > 0
 
-cursor.execute("SELECT AVG(price), MIN(price), MAX(price) FROM sales_spare_parts")
-avg_price, min_price, max_price = cursor.fetchone()
-print(f"Средняя цена: {avg_price}, Мин: {min_price}, Макс: {max_price}")
-assert max_price >= min_price
+def clear_employees(connection):
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM employees")
+    # Если PRIMARY KEY был задан с AUTOINCREMENT, необходимо сбросить
+    # счетчик в таблице sqlite_sequence, чтобы ID начинались с 1.
+    # Без этого новые записи будут продолжать нумерацию с последнего
+    # максимального ID, который когда-либо был в таблице.
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='employees'")
+    connection.commit()
 
-cursor.execute("SELECT category, SUM(revenue) FROM sales_spare_parts GROUP BY category")
-result = cursor.fetchall()
-for row in result:
-    print(f"Категория: {row[0]}, Общая выручка: {row[1]}")
-assert len(result) >= 1
+clear_employees(connection)
 
-cursor.execute("SELECT category, COUNT(*), SUM(revenue), AVG(price) FROM sales_spare_parts GROUP BY category")
-result = cursor.fetchall()
-for row in result:
-    print(f"Категория: {row[0]}, Кол-во: {row[1]}, Общая выручка: {row[2]}, Средняя цена: {row[3]}")
+print("Таблица employees очищена и счетчик ID сброшен")
 
-cursor.execute("SELECT category, SUM(revenue) AS total FROM sales_spare_parts GROUP BY category ORDER BY total DESC")
-result = cursor.fetchall()
-for row in result:
-    print(f"Категория: {row[0]}, Общая выручка: {row[1]}")
-assert len(result) >= 1
 
-cursor.execute("SELECT category, SUM(revenue) FROM sales_spare_parts GROUP BY category HAVING SUM(revenue) > 100000")
-result = cursor.fetchall()
-for row in result:
-    print(f"Категория: {row[0]}, Общая выручка: {row[1]}")
-assert len(result) >= 0
+def add_employees (connection, name, department, position):
+    cursor = connection.cursor()
+    cursor.execute(
+        "INSERT INTO employees  (name, department, position) VALUES (?, ?, ?)",
+        (name, department, position)
+    )
+    connection.commit()
+
+add_employees (connection, "Анна", "Бухгалтерия", "Главный бухгалтер")
+add_employees (connection, "Иван", "Отдел продаж", "Менеджер")
+add_employees (connection, "Наташа", "Бухгалтерия", "Бухгалтер")
+
+print("Сотрудники добавлены")
+
+
+
+def get_all_employees(connection):
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM employees")
+    return cursor.fetchall()
+
+employees = get_all_employees(connection)
+
+for employee in employees:
+    print(employee)
+
+assert len(employees) == 3
+
+
+def find_employees_by_position(connection, position):
+    cursor = connection.cursor()
+    cursor.execute(
+        "SELECT * FROM employees WHERE position = ?",
+        (position,)
+    )
+    return cursor.fetchall()
+
+account_employees = find_employees_by_position(connection, "Менеджер")
+
+for employee in account_employees:
+    print(employee)
+
+assert len(account_employees) == 1
+
+
+def find_employees_by_name(connection, name):
+    cursor = connection.cursor()
+    cursor.execute(
+        "SELECT * FROM employees WHERE name = ?",
+        (name,)
+    )
+    return cursor.fetchall()
+
+account_employees = find_employees_by_name(connection, "Иван")
+
+for employee in account_employees:
+    print(employee)
+
+assert len(account_employees) == 1
+
+
+def update_employees_position(connection, name, new_position):
+    cursor = connection.cursor()
+    cursor.execute(
+        "UPDATE employees SET position = ? WHERE name = ?",
+        (new_position, name)
+    )
+    connection.commit()
+
+update_employees_position(connection, "Иван", "Руководитель")
+
+ivan_updated = find_employees_by_name(connection, "Иван")
+
+print(ivan_updated)
+
+assert ivan_updated[0][3] == "Руководитель"
+
+
+def delete_employees(connection, name):
+    cursor = connection.cursor()
+    cursor.execute(
+        "DELETE FROM employees WHERE name = ?",
+        (name,)
+    )
+    connection.commit()
+
+delete_employees(connection, "Иван")
+
+employees_after_delete = get_all_employees(connection)
+
+for employee in employees_after_delete:
+    print(employee)
+
+assert len(employees_after_delete) == 2
+
 connection.close()
+
+print("Соединение закрыто")
