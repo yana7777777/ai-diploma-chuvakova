@@ -1,35 +1,34 @@
 import sqlite3
 
-print("sqlite3 подключен")
-
-def get_connection(db_name="python_sql_lesson08.db"):
+def get_connection(db_name="lesson09_employees.db"):
     connection = sqlite3.connect(db_name)
     return connection
 
 connection = get_connection()
+cursor = connection.cursor()
 
-print("Подключение создано")
-
+print("База данных подключена")
 assert connection is not None
 
 
 def create_employees_table(connection):
-  cursor = connection.cursor()
-  cursor.execute("""
-  CREATE TABLE IF NOT EXISTS employees (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT,
-      department TEXT,
-      position TEXT
-  )
-  """)
-
-  connection.commit()
+    cursor = connection.cursor()
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS employees (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        full_name TEXT,
+        department TEXT,
+        position TEXT,
+        hire_date TEXT,
+        salary INTEGER,
+        is_active INTEGER,
+        rating REAL
+    )
+    """)
+    connection.commit()
 
 create_employees_table(connection)
-
 print("Таблица employees создана")
-
 
 def clear_employees(connection):
     cursor = connection.cursor()
@@ -45,21 +44,25 @@ clear_employees(connection)
 
 print("Таблица employees очищена и счетчик ID сброшен")
 
-
-def add_employees (connection, name, department, position):
+def add_employee(connection, full_name, department, position, hire_date, salary, is_active, rating):
     cursor = connection.cursor()
     cursor.execute(
-        "INSERT INTO employees  (name, department, position) VALUES (?, ?, ?)",
-        (name, department, position)
+        """
+        INSERT INTO employees (full_name, department, position, hire_date, salary, is_active, rating)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (full_name, department, position, hire_date, salary, is_active, rating)
     )
     connection.commit()
 
-add_employees (connection, "Анна", "Бухгалтерия", "Главный бухгалтер")
-add_employees (connection, "Иван", "Отдел продаж", "Менеджер")
-add_employees (connection, "Наташа", "Бухгалтерия", "Бухгалтер")
+# Добавляем сотрудников (как в candidates - 7 полей)
+add_employee(connection, "Анна Смирнова", "Бухгалтерия", "Главный бухгалтер", "2020-03-15", 85000, 1, 4.8)
+add_employee(connection, "Иван Петров", "Отдел продаж", "Менеджер", "2021-06-10", 65000, 1, 4.2)
+add_employee(connection, "Ольга Иванова", "IT отдел", "Python Developer", "2022-01-20", 120000, 1, 4.9)
+add_employee(connection, "Павел Соколов", "Отдел продаж", "Старший менеджер", "2019-11-01", 85000, 1, 4.5)
+add_employee(connection, "Мария Кузнецова", "Бухгалтерия", "Бухгалтер", "2023-02-14", 55000, 0, 3.9)
 
 print("Сотрудники добавлены")
-
 
 
 def get_all_employees(connection):
@@ -72,75 +75,89 @@ employees = get_all_employees(connection)
 for employee in employees:
     print(employee)
 
-assert len(employees) == 3
+assert len(employees) == 5
 
-
-def find_employees_by_position(connection, position):
+def find_employees_by_is_active(connection, is_active):
     cursor = connection.cursor()
     cursor.execute(
-        "SELECT * FROM employees WHERE position = ?",
-        (position,)
+        "SELECT * FROM employees WHERE is_active = ?",
+        (is_active,)
     )
     return cursor.fetchall()
 
-account_employees = find_employees_by_position(connection, "Менеджер")
+is_active_employee = find_employees_by_is_active(connection, 0)
 
-for employee in account_employees:
+print("Новые кандидаты:")
+for employee in is_active_employee:
     print(employee)
 
-assert len(account_employees) == 1
+assert len(is_active_employee) == 1
 
 
-def find_employees_by_name(connection, name):
+def update_record(connection, employee_id, new_position, new_salary):
     cursor = connection.cursor()
     cursor.execute(
-        "SELECT * FROM employees WHERE name = ?",
-        (name,)
+        "UPDATE employees SET position = ?, salary = ? WHERE id = ?",
+        (new_position, new_salary, employee_id)
     )
+    connection.commit()
+
+update_record(connection, 1, "Финансовый директор", 120000)
+
+cursor.execute("SELECT * FROM employees WHERE id = 1")
+updated_employee = cursor.fetchone()
+print(updated_employee)
+
+assert updated_employee[3] == "Финансовый директор"
+assert updated_employee[5] == 120000
+
+
+def get_group_report(connection):
+    cursor = connection.cursor()
+    cursor.execute("SELECT department, COUNT(*), AVG(salary) FROM employees GROUP BY department")
     return cursor.fetchall()
 
-account_employees = find_employees_by_name(connection, "Иван")
+report = get_group_report(connection)
 
-for employee in account_employees:
-    print(employee)
+for row in report:
+    print(f"Отдел: {row[0]}, Сотрудников: {row[1]}, Средняя зарплата: {row[2]}")
 
-assert len(account_employees) == 1
+assert len(report) >= 1
 
 
-def update_employees_position(connection, name, new_position):
+def get_top_records(connection, limit=3):
     cursor = connection.cursor()
-    cursor.execute(
-        "UPDATE employees SET position = ? WHERE name = ?",
-        (new_position, name)
-    )
-    connection.commit()
+    cursor.execute("SELECT full_name, salary FROM employees ORDER BY salary DESC LIMIT ?", (limit,))
+    return cursor.fetchall()
 
-update_employees_position(connection, "Иван", "Руководитель")
+top_records = get_top_records(connection, 3)
 
-ivan_updated = find_employees_by_name(connection, "Иван")
+for row in top_records:
+    print(f"Сотрудник: {row[0]}, Зарплата: {row[1]}")
 
-print(ivan_updated)
-
-assert ivan_updated[0][3] == "Руководитель"
+assert len(top_records) == 3
 
 
-def delete_employees(connection, name):
-    cursor = connection.cursor()
-    cursor.execute(
-        "DELETE FROM employees WHERE name = ?",
-        (name,)
-    )
-    connection.commit()
+def show_project_summary(connection):
+    print("\n--- ОТЧЁТ ПО СОТРУДНИКАМ ---")
+    
+    employees = get_all_employees(connection)
+    print(f"Всего сотрудников: {len(employees)}")
+    
+    active = find_employees_by_is_active(connection, 1)
+    print(f"Активных сотрудников: {len(active)}")
+    
+    report = get_group_report(connection)
+    print("\nОтделы:")
+    for row in report:
+        print(f"  {row[0]}: {row[1]} чел., средняя з/п {row[2]:.0f}")
+    
+    top = get_top_records(connection, 3)
+    print("\nТоп-3 по зарплате:")
+    for row in top:
+        print(f"  {row[0]}: {row[1]}")
 
-delete_employees(connection, "Иван")
-
-employees_after_delete = get_all_employees(connection)
-
-for employee in employees_after_delete:
-    print(employee)
-
-assert len(employees_after_delete) == 2
-
+show_project_summary(connection)
 connection.close()
-
 print("Соединение закрыто")
+
