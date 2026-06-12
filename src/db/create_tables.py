@@ -43,7 +43,7 @@
 # connection.commit()
 # print("Изменения сохранены")
 
-# # получите все
+
 
 # cursor.execute("SELECT * FROM students")
 
@@ -68,4 +68,19 @@
 # print(moskva_students)
 
 # assert len(moskva_students) >= 1
+
+# cursor.execute("""
+# CREATE TABLE IF NOT EXISTS revenues (
+#     id INTEGER PRIMARY KEY AUTOINCREMENT,
+#     company_name TEXT,
+#     revenue_amount REAL,
+#     revenue_date TEXT,
+#     category TEXT,
+#     region TEXT
+# )
+# """)
+
+# connection.commit()
+
+# print("Таблица revenues создана")
 
