@@ -43,7 +43,7 @@ clear_employees(connection)
 
 print("Таблица employees очищена и счетчик ID сброшен")
 
-def add_employees (connection, name, department, position):
+def add_employees(connection, name, department, position):
     cursor = connection.cursor()
     cursor.execute(
         "INSERT INTO employees  (name, department, position) VALUES (?, ?, ?)",
