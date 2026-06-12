@@ -51,3 +51,42 @@ Python 3.7+
 
 Автор    Yana Chuvakova
 
+readme_text = """
+# Проект: Анализ доходов компании
+
+## Описание проекта
+Проект предназначен для анализа финансовых данных компании. База данных содержит информацию о доходах по разным компаниям, категориям и регионам.
+
+## Технологии
+- Python
+- SQLite3
+- SQL запросы (SELECT, INSERT, GROUP BY, ORDER BY, агрегатные функции)
+
+## Основные функции
+- `create_main_table()` - создание таблицы revenues
+- `add_record()` - добавление записей о доходах
+- `get_all_records()` - получение всех записей
+- `find_by_filter()` - поиск по компании
+- `get_average_value()` - расчёт средней выручки
+- `get_group_report()` - отчёт по категориям
+- `get_top_records()` - топ записей по выручке
+
+## Структура таблицы revenues
+- id - первичный ключ
+- company_name - название компании
+- revenue_amount - сумма дохода
+- revenue_date - дата получения
+- category - категория дохода
+- region - регион
+
+## Пример использования
+```python
+connection = sqlite3.connect("exam_ready_project.db")
+add_record(connection, "ООО Ромашка", 500000, "2025-05-01", "Продукты", "Москва")
+records = get_all_records(connection)
+
+"""
+
+print(readme_text)
+assert "sqlite3" in readme_text or "SQLite" in readme_text
+

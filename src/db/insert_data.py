@@ -99,3 +99,44 @@
 # connection.close()
 
 # print("Соединение закрыто")
+
+def clear_table(connection):
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM revenues")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='revenues'")
+    connection.commit()
+
+def add_record(connection, company_name, revenue_amount, revenue_date, category, region):
+    cursor = connection.cursor()
+    cursor.execute(
+        "INSERT INTO revenues (company_name, revenue_amount, revenue_date, category, region) VALUES (?, ?, ?, ?, ?)",
+        (company_name, revenue_amount, revenue_date, category, region)
+    )
+    connection.commit()
+
+def insert_all_data(connection):
+    clear_table(connection)
+    
+    # 20 записей
+    add_record(connection, "ООО Ромашка", 500000, "2025-05-01", "Продукты", "Москва")
+    add_record(connection, "ООО Ромашка", 300000, "2025-05-10", "Услуги", "СПб")
+    add_record(connection, "ООО Василек", 750000, "2025-05-15", "Продукты", "Казань")
+    add_record(connection, "ООО Василек", 200000, "2025-05-20", "Консультации", "Москва")
+    add_record(connection, "ООО Ромашка", 400000, "2025-06-01", "Продукты", "Москва")
+    add_record(connection, "ООО Ромашка", 250000, "2025-06-10", "Услуги", "Москва")
+    add_record(connection, "ООО Ромашка", 180000, "2025-06-15", "Консультации", "СПб")
+    add_record(connection, "ООО Василек", 620000, "2025-06-20", "Продукты", "Казань")
+    add_record(connection, "ООО Василек", 350000, "2025-06-25", "Услуги", "Москва")
+    add_record(connection, "ИП Иванов", 120000, "2025-05-05", "Консультации", "Новосибирск")
+    add_record(connection, "ИП Иванов", 95000, "2025-05-18", "Продукты", "Новосибирск")
+    add_record(connection, "ИП Иванов", 210000, "2025-06-05", "Услуги", "Новосибирск")
+    add_record(connection, "ООО Солнышко", 890000, "2025-05-12", "Продукты", "Екатеринбург")
+    add_record(connection, "ООО Солнышко", 340000, "2025-05-28", "Консультации", "Екатеринбург")
+    add_record(connection, "ООО Солнышко", 560000, "2025-06-08", "Продукты", "Екатеринбург")
+    add_record(connection, "ООО Солнышко", 120000, "2025-06-18", "Услуги", "Екатеринбург")
+    add_record(connection, "ЗАО Вектор", 430000, "2025-05-22", "Консультации", "Нижний Новгород")
+    add_record(connection, "ЗАО Вектор", 670000, "2025-06-02", "Продукты", "Нижний Новгород")
+    add_record(connection, "ЗАО Вектор", 290000, "2025-06-12", "Услуги", "Нижний Новгород")
+    add_record(connection, "ООО Лидер", 550000, "2025-06-20", "Продукты", "Ростов-на-Дону")
+    
+    print("Таблица очищена и добавлено 20 записей")

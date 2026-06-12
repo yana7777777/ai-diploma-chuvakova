@@ -84,3 +84,19 @@
 
 # print("Таблица revenues создана")
 
+
+def create_main_table(connection):
+    cursor = connection.cursor()
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS revenues (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_name TEXT,
+        revenue_amount REAL,
+        revenue_date TEXT,
+        category TEXT,
+        region TEXT
+    )
+    """)
+    connection.commit()
+
+
