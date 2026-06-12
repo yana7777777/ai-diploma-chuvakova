@@ -1,12 +1,13 @@
 import sqlite3
 
-connection = sqlite3.connect("design_lesson04.db")
+connection = sqlite3.connect("relations_lesson05.db")
 cursor = connection.cursor()
 
 print("База данных подключена")
 
-project_topic = "My topic is Finance"  
-print(project_topic)
+cursor.execute("PRAGMA foreign_keys = ON")
+
+print("Поддержка FOREIGN KEY включена")
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS revenues (
@@ -24,28 +25,14 @@ connection.commit()
 print("Таблица revenues создана")
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS employee_salaries (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    employee_name TEXT,
-    department TEXT,
-    position TEXT,
-    salary REAL,
-    payment_date TEXT
-)
-""")
-
-connection.commit()
-
-print("Таблица employee_salaries создана")
-
-cursor.execute("""
 CREATE TABLE IF NOT EXISTS expenses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    expense_category TEXT,
+    revenue_id INTEGER,
     expense_name TEXT,
-    amount REAL,
-    expense_date TEXT,
-    responsible_person TEXT
+    expense_amount REAL,
+    category TEXT,
+    region TEXT,
+    FOREIGN KEY (revenue_id) REFERENCES revenues(id)
 )
 """)
 
@@ -53,78 +40,84 @@ connection.commit()
 
 print("Таблица expenses создана")
 
-cursor.execute("""
-SELECT name FROM sqlite_master
-WHERE type = 'table'
-""")
-
-tables = cursor.fetchall()
-
-print("Таблицы в базе:")
-for table in tables:
-    print(table)
-
-assert len(tables) >= 3
-
-cursor.execute("""
-INSERT INTO revenues (company_name, revenue_amount, revenue_date, category, region) VALUES
-('ООО Ромашка', 500000, '2025-05-01', 'Продукты', 'Москва'),
-('ООО Ромашка', 300000, '2025-05-10', 'Услуги', 'СПб'),
-('ООО Василек', 750000, '2025-05-15', 'Продукты', 'Казань'),
-('ООО Василек', 200000, '2025-05-20', 'Консультации', 'Москва')
-""")
+cursor.execute("DELETE FROM revenues")
+cursor.execute("DELETE FROM expenses")
 
 connection.commit()
 
-print("записи добавлены в таблицу revenues")
+print("Таблицы очищены")
 
-cursor.execute("""
-INSERT INTO employee_salaries (employee_name, department, position, salary, payment_date) VALUES
-('Иванов Иван', 'Sales', 'Менеджер', 80000, '2025-05-25'),
-('Петрова Анна', 'Sales', 'Старший менеджер', 120000, '2025-05-25'),
-('Сидоров Петр', 'IT', 'Программист', 150000, '2025-05-25'),
-('Козлова Мария', 'Marketing', 'Маркетолог', 90000, '2025-05-25')
-""")
+revenues = [
+    ("ООО Ромашка", 500000, "2025-05-01", "Продукты", "Москва"),
+    ("ООО Ромашка", 300000, "2025-05-10", "Услуги", "СПб"),
+    ("ООО Василек", 750000, "2025-05-15", "Продукты", "Казань"),
+    ("ООО Василек", 200000, "2025-05-20", "Консультации", "Москва")
+]
 
-connection.commit()
-print("записи добавлены в employee_salaries")
-
-cursor.execute("""
-INSERT INTO expenses (expense_category, expense_name, amount, expense_date, responsible_person) VALUES
-('Офис', 'Аренда офиса', 100000, '2025-05-01', 'Иванов Иван'),
-('Офис', 'Канцтовары', 15000, '2025-05-05', 'Петрова Анна'),
-('Зарплата', 'Выдача зарплаты', 500000, '2025-05-25', 'Сидоров Петр'),
-('Реклама', 'Реклама в интернете', 50000, '2025-05-15', 'Козлова Мария')
-""")
+cursor.executemany(
+    "INSERT INTO revenues (company_name, revenue_amount, revenue_date, category, region) VALUES (?, ?, ?, ?, ?)",
+    revenues
+)
 
 connection.commit()
-print("Записи добавлены в таблицу expenses")
 
+print("Записи добавлены в таблицу revenues")
 
 
 cursor.execute("SELECT * FROM revenues")
 rows = cursor.fetchall()
 for row in rows:
     print(row)
-assert len(rows) >= 2
 
+first_id = rows[0][0]
+second_id = rows[1][0]
 
-cursor.execute("SELECT * FROM employee_salaries")
-rows = cursor.fetchall()
-for row in rows:
+assert first_id is not None
+assert second_id is not None
+
+expenses = [
+    (1, "Аренда офиса", 100000, "Аренда", "Москва"),
+    (1, "Канцтовары", 15000, "Офисные расходы", "Москва"),
+    (2, "Реклама", 50000, "Маркетинг", "СПб"),
+    (3, "Зарплата", 300000, "Персонал", "Казань"),
+    (3, "Коммунальные услуги", 25000, "Коммуналка", "Казань"),
+    (4, "Транспорт", 30000, "Логистика", "Москва")
+]
+
+cursor.executemany(
+    "INSERT INTO expenses (revenue_id, expense_name, expense_amount, category, region) VALUES (?, ?, ?, ?, ?)",
+    expenses
+)
+
+connection.commit()
+
+print("Записи добавлены в таблицу expenses")
+
+cursor.execute("SELECT * FROM revenues")
+revenues_rows = cursor.fetchall()
+print("Таблица revenues:")
+for row in revenues_rows:
     print(row)
-assert len(rows) >= 2
+
+cursor.execute("SELECT * FROM expenses")
+expenses_rows = cursor.fetchall()
+print("\nТаблица expenses:")
+for row in expenses_rows:
+    print(row)
 
 
+assert len(revenues_rows) >= 4
+assert len(expenses_rows) >= 4
+print("\nПроверка пройдена: в обеих таблицах достаточно записей")
 
-for table_name in ["revenues", "employee_salaries", "expenses"]:
-    print("\nТаблица:", table_name)
-    cursor.execute(f"SELECT * FROM {table_name}")
-    rows = cursor.fetchall()
-    for row in rows:
-        print(row)
-    assert len(rows) >= 1
+cursor.execute("SELECT * FROM expenses WHERE revenue_id = ?", (1,))
+expenses_for_revenue = cursor.fetchall()
+
+print("Расходы для revenue_id = 1:")
+for row in expenses_for_revenue:
+    print(row)
+
+assert len(expenses_for_revenue) > 0
 
 connection.close()
 
-print("Соединение закрыто")
