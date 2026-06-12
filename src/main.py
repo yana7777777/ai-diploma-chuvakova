@@ -1,149 +1,138 @@
 import sqlite3
 
-connection = sqlite3.connect("join_lesson06.db")
-cursor = connection.cursor()
+print("sqlite3 подключен")
 
-cursor.execute("PRAGMA foreign_keys = ON")
+def get_connection(db_name="python_sql_lesson08.db"):
+    connection = sqlite3.connect(db_name)
+    return connection
 
-print("База данных подключена")
+connection = get_connection()
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS employees (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    department TEXT,
-    position TEXT
-)
-""")
+print("Подключение создано")
 
-connection.commit()
+assert connection is not None
+
+def create_employees_table(connection):
+  cursor = connection.cursor()
+  cursor.execute("""
+  CREATE TABLE IF NOT EXISTS employees (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      department TEXT,
+      position TEXT
+  )
+  """)
+
+  connection.commit()
+
+create_employees_table(connection)
 
 print("Таблица employees создана")
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS work_records (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    employee_id INTEGER,
-    department TEXT,
-    position TEXT,
-    task_title TEXT,
-    hours INTEGER
-)
-""")
+def clear_employees(connection):
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM employees")
+    # Если PRIMARY KEY был задан с AUTOINCREMENT, необходимо сбросить
+    # счетчик в таблице sqlite_sequence, чтобы ID начинались с 1.
+    # Без этого новые записи будут продолжать нумерацию с последнего
+    # максимального ID, который когда-либо был в таблице.
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='employees'")
+    connection.commit()
 
-connection.commit()
+clear_employees(connection)
 
-print("Таблица work_records создана")
+print("Таблица employees очищена и счетчик ID сброшен")
 
-cursor.execute("DELETE FROM employees")
-cursor.execute("DELETE FROM work_records")
+def add_employees (connection, name, department, position):
+    cursor = connection.cursor()
+    cursor.execute(
+        "INSERT INTO employees  (name, department, position) VALUES (?, ?, ?)",
+        (name, department, position)
+    )
+    connection.commit()
 
-employees = [
-    (1, "Анна", "Бухгалтерия", "главный бухгалтер"),
-    (2, "Иван", "Отдел продаж", "менеджер"),
-    (3, "Галя", "Отдел продаж", "Руководитель продаж"),
-    (4, "Наташа", "Бухгалтерия", "бухгалтер")
-
-]
-
-cursor.executemany(
-    "INSERT INTO employees (id, name, department, position) VALUES (?, ?, ?, ?)",
-    employees
-)
-
-connection.commit()
+add_employees (connection, "Анна", "Бухгалтерия", "Главный бухгалтер")
+add_employees (connection, "Иван", "Отдел продаж", "Менеджер")
+add_employees (connection, "Наташа", "Бухгалтерия", "Бухгалтер")
 
 print("Сотрудники добавлены")
 
-cursor.execute("SELECT * FROM employees")
-employees_data = cursor.fetchall()
+def get_all_employees(connection):
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM employees")
+    return cursor.fetchall()
 
-for employee in employees_data:
+employees = get_all_employees(connection)
+
+for employee in employees:
     print(employee)
 
-anna_id = employees_data[0][0]
-ivan_id = employees_data[1][0]
-galya_id = employees_data[2][0]
+assert len(employees) == 3
 
-work_records = [
-    (anna_id, "Составить отчёт", 10),
-    (anna_id, "Проверить счета", 5),
-    (ivan_id, "Позвонить клиентам", 8),
-    (galya_id, "Провести планёрку", 2)
-]
+def find_employees_by_position(connection, position):
+    cursor = connection.cursor()
+    cursor.execute(
+        "SELECT * FROM employees WHERE position = ?",
+        (position,)
+    )
+    return cursor.fetchall()
 
-cursor.executemany(
-    "INSERT INTO work_records (employee_id, task_title, hours) VALUES (?, ?, ?)",
-    work_records
-)
+account_employees = find_employees_by_position(connection, "Менеджер")
 
-connection.commit()
+for employee in account_employees:
+    print(employee)
 
-print("Рабочие записи добавлены")
+assert len(account_employees) == 1
 
+def find_employees_by_name(connection, name):
+    cursor = connection.cursor()
+    cursor.execute(
+        "SELECT * FROM employees WHERE name = ?",
+        (name,)
+    )
+    return cursor.fetchall()
 
-cursor.execute("SELECT * FROM employees")
-employees_rows = cursor.fetchall()
+account_employees = find_employees_by_name(connection, "Иван")
 
-cursor.execute("SELECT * FROM work_records")
-work_records_rows = cursor.fetchall()
+for employee in account_employees:
+    print(employee)
 
-for row in employees_rows:
-    print(row)
+assert len(account_employees) == 1
 
-for row in work_records_rows:
-    print(row)
+def update_employees_position(connection, name, new_position):
+    cursor = connection.cursor()
+    cursor.execute(
+        "UPDATE employees SET position = ? WHERE name = ?",
+        (new_position, name)
+    )
+    connection.commit()
 
-assert len(employees_rows) >= 3
-assert len(work_records_rows) >= 3
+update_employees_position(connection, "Иван", "Руководитель")
 
-cursor.execute("""
-SELECT * FROM employees
-INNER JOIN work_records ON employees.id = work_records.employee_id
-""")
-result = cursor.fetchall()
+ivan_updated = find_employees_by_name(connection, "Иван")
 
-for row in result:
-    print(row)
+print(ivan_updated)
 
-assert len(result) > 0
+assert ivan_updated[0][3] == "Руководитель"
 
-cursor.execute("""
-SELECT * FROM employees
-INNER JOIN work_records ON employees.id = work_records.employee_id
-WHERE employees.department = 'Отдел продаж'
-""")
-result = cursor.fetchall()
+def delete_employees(connection, name):
+    cursor = connection.cursor()
+    cursor.execute(
+        "DELETE FROM employees WHERE name = ?",
+        (name,)
+    )
+    connection.commit()
 
-for row in result:
-    print(row)
+delete_employees(connection, "Иван")
 
-cursor.execute("""
-SELECT * FROM employees
-LEFT JOIN work_records ON employees.id = work_records.employee_id
-""")
-result = cursor.fetchall()
+employees_after_delete = get_all_employees(connection)
 
-for row in result:
-    print(row)
+for employee in employees_after_delete:
+    print(employee)
 
-assert len(result) >= len(employees_rows)
-
-cursor.execute("""
-SELECT employees.name, COUNT(work_records.id) as task_count
-FROM employees
-LEFT JOIN work_records ON employees.id = work_records.employee_id
-GROUP BY employees.id
-""")
-result = cursor.fetchall()
-
-print("Отчёт: количество задач по сотрудникам")
-for row in result:
-    print(f"Сотрудник: {row[0]}, задач: {row[1]}")
-
-assert len(result) > 0
+assert len(employees_after_delete) == 2
 
 connection.close()
 
-
+print("Соединение закрыто")
 
