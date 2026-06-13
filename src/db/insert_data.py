@@ -99,3 +99,28 @@
 # connection.close()
 
 # print("Соединение закрыто")
+
+def clear_table(connection):
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM revenues")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='revenues'")
+    connection.commit()
+
+def add_record(connection, company_name, revenue_amount, revenue_date, category, region):
+    cursor = connection.cursor()
+    cursor.execute(
+        "INSERT INTO revenues (company_name, revenue_amount, revenue_date, category, region) VALUES (?, ?, ?, ?, ?)",
+        (company_name, revenue_amount, revenue_date, category, region)
+    )
+    connection.commit()
+
+def insert_all_data(connection):
+    clear_table(connection)
+    
+    add_record(connection, "ООО Ромашка", 500000, "2025-05-01", "Продукты", "Москва")
+    add_record(connection, "ООО Ромашка", 300000, "2025-05-10", "Услуги", "СПб")
+    add_record(connection, "ООО Василек", 750000, "2025-05-15", "Продукты", "Казань")
+    add_record(connection, "ООО Василек", 200000, "2025-05-20", "Консультации", "Москва")
+    add_record(connection, "ООО Ромашка", 400000, "2025-06-01", "Продукты", "Москва")
+    
+    print("Таблица очищена и добавлено 5 записей")

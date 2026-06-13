@@ -31,3 +31,10 @@
 
 # print("Соединение с базой данных закрыто")
 
+import sqlite3
+
+def get_connection(db_name="exam_ready_project.db"):
+    return sqlite3.connect(db_name)
+
+
+
