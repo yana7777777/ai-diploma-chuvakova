@@ -1,160 +1,118 @@
-import numpy as np
-import matplotlib.pyplot as plt
+scores = [60, 75, 80, 50, 95, 70]
 
-print("Библиотеки подключены")
+print("Оценки:", scores)
+print("Количество оценок:", len(scores))
 
-x = np.linspace(-10, 10, 200)
-y = x ** 2
-
-plt.figure(figsize=(8, 5))
-plt.plot(x, y)
-plt.title("Степенная функция y = x²")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
-
-assert len(x) == len(y)
-
-x = np.linspace(-10, 10, 200)
-y = x ** 3
-
-plt.figure(figsize=(7, 4))
-plt.plot(x, y)
-plt.title("Кубическая функция y = x³")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
-
-assert y[0] < 0
-assert y[-1] > 0
+assert len(scores) == 6
 
 
-x = np.linspace(0, 10, 15, 25)
-y = np.sqrt(x)
+scores = [60, 75, 80, 50, 95, 70]
 
-plt.figure(figsize=(7, 4))
-plt.plot(x, y)
-plt.title("Функция корня y = sqrt(x)")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
+average_score = sum(scores) / len(scores)
 
-assert np.min(y) >= 0
+print("Средний балл:", average_score)
 
-
-x = np.linspace(-5, 5, 200)
-y = 2 ** x
-
-plt.figure(figsize=(7, 4))
-plt.plot(x, y)
-plt.title("Показательная функция y = 2ˣ")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
-
-assert np.all(y > 0)
-
-
-x = np.linspace(0.1, 11, 15, 20)
-y = np.log(x)
-
-plt.figure(figsize=(7, 4))
-plt.plot(x, y)
-plt.title("Логарифмическая функция y = log(x)")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
-
-assert len(x) == len(y)
-
-
-x = np.linspace(-2 * np.pi, 2 * np.pi, 100)
-y = np.sin(x)
-
-plt.figure(figsize=(7, 4))
-plt.plot(x, y)
-plt.title("Функция y = sin(x)")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
-
-assert np.max(y) <= 1.01
-assert np.min(y) >= -1.01
-
-
-x = np.linspace(-2 * np.pi, 2 * np.pi, 200)
-y = np.cos(x)
-
-plt.figure(figsize=(7, 4))
-plt.plot(x, y)
-plt.title("Функция y = cos(x)")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
-
-assert np.max(y) <= 1.01
-assert np.min(y) >= -1.01
-
-
-x = np.linspace(-2 * np.pi, 2 * np.pi, 200)
-
-y_sin = np.sin(x)
-y_cos = np.cos(x)
-
-plt.figure(figsize=(8, 5))
-plt.plot(x, y_sin, label="sin(x)")
-plt.plot(x, y_cos, label="cos(x)")
-
-plt.legend()
-plt.grid(True)
-plt.title("Сравнение sin(x) и cos(x)")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.show()
-
-assert len(x) == 200
-assert np.max(y_sin) <= 1.01 and np.min(y_sin) >= -1.01
-assert np.max(y_cos) <= 1.01 and np.min(y_cos) >= -1.01
+assert average_score > 0
 
 
 
-x = np.linspace(0.1, 10, 150)
+scores = [60, 75, 80, 50, 95, 70]
 
-y_linear = x
-y_square = x ** 2
-y_log = np.log(x)
-y_exp = 2 ** x
+max_score = max(scores)
+min_score = min(scores)
 
-plt.figure(figsize=(9, 6))
-plt.plot(x, y_linear, label="y = x")
-plt.plot(x, y_square, label="y = x²")
-plt.plot(x, y_log, label="y = log(x)")
-plt.plot(x, y_exp, label="y = 2ˣ")
+print("Максимум:", max_score)
+print("Минимум:", min_score)
 
-plt.title("Сравнение элементарных функций")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.legend()
-plt.grid(True)
-plt.show()
+assert max_score == 95
+assert min_score == 50
 
-summary = [
-    "Линейная функция растет равномерно",
-    "Квадратичная растет быстрее линейной",
-    "Логарифм растет медленно",
-    "Экспонента растет быстрее всех"
+
+scores = [60, 75, 80, 50, 95, 70]
+
+high_scores = []
+
+for score in scores:
+    if score > 60:
+        high_scores.append(score)
+
+print("Оценки выше 80:", high_scores)
+
+assert len(high_scores) == 4
+
+
+user = {
+    "name": "Галя",
+    "city": "Самара",
+    "id": 20,
+    "status": "new",
+    "rating": 4.5
+}
+
+print(user)
+print("Имя:", user["name"])
+print("id:", user["id"])
+
+assert user["city"] == "Самара"
+
+
+users = [
+    {"name": "Галя", "city": "Самара", "id": 20, "status": "new", "rating": 4.5},
+    {"name": "Петр", "city": "Москва", "id": 21, "status": "active", "rating": 3.8},
+    {"name": "Ольга", "city": "Казань", "id": 22, "status": "blocked", "rating": 4.9},
+    {"name": "Иван", "city": "Уфа", "id": 23, "status": "active", "rating": 3.2}
 ]
 
-for item in summary:
-    print("-", item)
+for user in users:
+    print(user)
 
-assert len(summary) == 4
+assert len(users) == 4
+
+
+filtered_items = []
+
+for user in users:
+    if user["city"] == "Казань" and user["status"] == "blocked":
+        filtered_items.append(user)
+
+print(filtered_items)
+
+assert len(filtered_items) >= 1
+
+
+sorted_users = sorted(users, key=lambda x: x["id"])
+
+print(sorted_users)
+
+assert len(sorted_users) == 4
+assert sorted_users[0]["id"] < sorted_users[-1]["id"]
+
+
+items = [1, 2, 3, 2, 4, 5, 3, 6, 1]
+
+unique_values = set(items)
+
+print("Уникальные значения:", unique_values)
+
+assert len(unique_values) >= 2
+
+
+users = [
+    {"name": "Галя", "city": "Самара", "id": 20, "status": "new", "rating": 4.5},
+    {"name": "Петр", "city": "Москва", "id": 21, "status": "active", "rating": 3.8},
+    {"name": "Ольга", "city": "Казань", "id": 22, "status": "blocked", "rating": 4.9},
+    {"name": "Иван", "city": "Уфа", "id": 23, "status": "active", "rating": 3.2}
+]
+
+filtered = [user for user in users if user["status"] == "active"]
+
+sorted_users = sorted(filtered, key=lambda x: x["id"], reverse=True)
+
+best = sorted_users[0] if sorted_users else None
+
+print("Лучший результат:", best)
+
+assert best is not None
+assert best["rating"] >= 3.2
 
 
