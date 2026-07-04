@@ -1,0 +1,201 @@
+import os
+import webbrowser
+
+def open_chat_bot():
+    html_content = '''<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Чат-бот по математике</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #0b1120;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            width: 500px;
+            max-width: 95%;
+            background: #1e293b;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid #334155;
+        }
+        h2 {
+            color: #94a3b8;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .chat-box {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 15px;
+            height: 320px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border: 1px solid #334155;
+        }
+        .chat-box p {
+            color: #e2e8f0;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin: 6px 0;
+            line-height: 1.5;
+        }
+        .user-msg {
+            background: #2563eb;
+            text-align: right;
+            border-bottom-right-radius: 0;
+        }
+        .bot-msg {
+            background: #1e293b;
+            text-align: left;
+            border-bottom-left-radius: 0;
+            border-left: 3px solid #3b82f6;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 30px;
+            border: none;
+            background: #0f172a;
+            color: #f1f5f9;
+            font-size: 14px;
+            outline: none;
+            border: 1px solid #334155;
+        }
+        .input-area input::placeholder {
+            color: #64748b;
+        }
+        .input-area button {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 30px;
+            background: #3b82f6;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .input-area button:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .footer-chat {
+            text-align: center;
+            margin-top: 12px;
+            color: #475569;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <h2>🤖 Чат-бот по математике</h2>
+    <div class="chat-box" id="chatBox">
+        <p class="bot-msg">Привет! Я чат-бот по математике. Задай мне вопрос.</p>
+    </div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Напиши вопрос...">
+        <button id="sendBtn">Отправить</button>
+    </div>
+    <div class="footer-chat">Блок 3. Основы математики и информатики</div>
+</div>
+
+<script>
+    const chatBox = document.getElementById("chatBox");
+    const input = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function addMessage(text, type) {
+        const p = document.createElement("p");
+        p.className = type === "user" ? "user-msg" : "bot-msg";
+        p.textContent = text;
+        chatBox.appendChild(p);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getBotReply(msg) {
+        const lower = msg.toLowerCase();
+
+        if (lower.includes("функц")) {
+            return "Функция — это правило, которое каждому x ставит в соответствие y. Например: y = 2x + 1, y = x², y = sin(x).";
+        }
+        if (lower.includes("предел") || lower.includes("lim")) {
+            return "Предел — это значение, к которому стремится функция при приближении x к определённой точке. Например: lim (x²−9)/(x−3) при x→3 = 6.";
+        }
+        if (lower.includes("производн")) {
+            return "Производная — это скорость изменения функции. Например: если f(x) = x³ − 3x, то f'(x) = 3x² − 3.";
+        }
+        if (lower.includes("оптимиз") || lower.includes("градиент") || lower.includes("спуск")) {
+            return "Градиентный спуск — метод оптимизации, который ищет минимум функции. Например: для loss(x) = (x−3)²+2 минимум в точке x=3.";
+        }
+        if (lower.includes("непрерыв")) {
+            return "Непрерывная функция — это функция без разрывов. Например: y = (x−2)²+1 непрерывна на всей числовой оси.";
+        }
+        if (lower.includes("линейн")) {
+            return "Линейная функция: y = kx + b. График — прямая. Пример: y = 2x + 1.";
+        }
+        if (lower.includes("квадрат")) {
+            return "Квадратичная функция: y = ax² + bx + c. График — парабола. Пример: y = x² − 4x + 3.";
+        }
+        if (lower.includes("sin") || lower.includes("cos")) {
+            return "Тригонометрические функции: sin(x), cos(x) — периодические, используются в анализе данных и ML.";
+        }
+        if (lower.includes("log") || lower.includes("логарифм")) {
+            return "Логарифмическая функция: y = ln(x). Определена при x > 0. Используется для масштабирования данных.";
+        }
+        if (lower.includes("привет") || lower.includes("здрав")) {
+            return "Привет! Я чат-бот по математике. Задавай любые вопросы по теме!";
+        }
+        if (lower.includes("спасиб")) {
+            return "Пожалуйста! Обращайся, если что-то ещё нужно.";
+        }
+
+        return "Я пока не знаю ответа на этот вопрос. Попробуй спросить про: функции, пределы, производные, оптимизацию, градиентный спуск, непрерывность, линейные или квадратичные функции.";
+    }
+
+    function sendMessage() {
+        const msg = input.value.trim();
+        if (msg === "") return;
+
+        addMessage(msg, "user");
+        input.value = "";
+
+        setTimeout(function() {
+            const reply = getBotReply(msg);
+            addMessage(reply, "bot");
+        }, 300);
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            sendMessage();
+        }
+    });
+
+    console.log("Chat bot loaded successfully!");
+</script>
+
+</body>
+</html>'''
+
+    with open("data/chat_bot.html", "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+    full_path = os.path.abspath("data/chat_bot.html")
+    webbrowser.open(full_path)
+    print(f"✅ ПРОСТОЙ ЧАТ-БОТ ОТКРЫТ: {full_path}")
