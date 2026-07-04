@@ -1,118 +1,145 @@
-scores = [60, 75, 80, 50, 95, 70]
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
-print("Оценки:", scores)
-print("Количество оценок:", len(scores))
+print("Библиотеки подключены")
 
-assert len(scores) == 6
+x_values = [1.5, 1.9, 1.99, 2.0, 2.01, 2.1, 2.5]
 
+y_values = []
 
-scores = [60, 75, 80, 50, 95, 70]
+for x in x_values:
+    y_values.append(3 * x)
 
-average_score = sum(scores) / len(scores)
+table = pd.DataFrame({
+    "x": x_values,
+    "y = 3x": y_values
+})
 
-print("Средний балл:", average_score)
+table
 
-assert average_score > 0
+x = np.linspace(0, 6, 100)
+y = 3 * x
 
+plt.figure(figsize=(7, 4))
+plt.plot(x, y, label="y = 3x")
+plt.scatter([2], [6], label="точка x=2, y=6")
 
+plt.title("Предел на примере y = 3x")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.grid(True)
+plt.legend()
+plt.show()
 
-scores = [60, 75, 80, 50, 95, 70]
-
-max_score = max(scores)
-min_score = min(scores)
-
-print("Максимум:", max_score)
-print("Минимум:", min_score)
-
-assert max_score == 95
-assert min_score == 50
-
-
-scores = [60, 75, 80, 50, 95, 70]
-
-high_scores = []
-
-for score in scores:
-    if score > 60:
-        high_scores.append(score)
-
-print("Оценки выше 80:", high_scores)
-
-assert len(high_scores) == 4
+assert 3 * 2 == 6
 
 
-user = {
-    "name": "Галя",
-    "city": "Самара",
-    "id": 20,
-    "status": "new",
-    "rating": 4.5
-}
+left_x = [1.9, 1.99, 1.999]
+right_x = [2.1, 2.01, 2.001]
 
-print(user)
-print("Имя:", user["name"])
-print("id:", user["id"])
+left_y = [2 * x for x in left_x]
+right_y = [2 * x for x in right_x]
 
-assert user["city"] == "Самара"
+table = pd.DataFrame({
+    "x слева": left_x,
+    "y слева": left_y,
+    "x справа": right_x,
+    "y справа": right_y
+})
+
+table
 
 
-users = [
-    {"name": "Галя", "city": "Самара", "id": 20, "status": "new", "rating": 4.5},
-    {"name": "Петр", "city": "Москва", "id": 21, "status": "active", "rating": 3.8},
-    {"name": "Ольга", "city": "Казань", "id": 22, "status": "blocked", "rating": 4.9},
-    {"name": "Иван", "city": "Уфа", "id": 23, "status": "active", "rating": 3.2}
+x_values = [2.5, 2.9, 2.99, 3.0, 3.01, 3.1, 3.5]
+y_values = [x ** 2 for x in x_values]
+
+table = pd.DataFrame({
+    "x": x_values,
+    "y = x²": y_values
+})
+
+table
+
+
+x = np.linspace(-1, 5, 200)
+y = x ** 2
+
+plt.figure(figsize=(7, 4))
+plt.plot(x, y, label="y = x²")
+plt.scatter([3], [9], label="x=3, y=9")
+
+plt.title("Предел на примере y = x²")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+assert 3 ** 2 == 9
+
+
+x_values = [0.7, 0.9, 0.99, 0.999, 1.003, 1.03, 1.3, 1.8]
+
+y_values = []
+
+for x in x_values:
+    y = (x ** 2 - 4) / (x - 2)
+    y_values.append(y)
+
+table = pd.DataFrame({
+    "x": x_values,
+    "y": y_values
+})
+
+table
+
+
+x_left = np.linspace(-1, 1.99, 100)
+x_right = np.linspace(2.01, 4, 100)
+
+y_left = (x_left ** 2 - 4) / (x_left - 2)
+y_right = (x_right ** 2 - 4) / (x_right - 2)
+
+plt.figure(figsize=(7, 4))
+plt.plot(x_left, y_left)
+plt.plot(x_right, y_right)
+plt.scatter([2], [4], facecolors='none', edgecolors='black', label="предел = 4")
+
+plt.title("Функция не определена в x=2, но предел есть")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+
+epochs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+loss = [0.9, 0.75, 0.6, 0.48, 0.38, 0.30, 0.23, 0.18, 0.14, 0.10]
+
+plt.figure(figsize=(7, 4))
+plt.plot(epochs, loss, marker='o', linestyle='-')
+
+plt.title("Ошибка модели стремится к 0")
+plt.xlabel("Эпоха")
+plt.ylabel("Loss")
+plt.grid(True)
+plt.show()
+
+assert loss[-1] < loss[0]
+
+
+summary = [
+    "Предел показывает, к чему стремится функция",
+    "К точке можно приближаться слева и справа",
+    "Функция может иметь предел, даже если не определена в точке",
+    "Пределы нужны для понимания производной и оптимизации",
+    "В AI идея предела связана с уменьшением ошибки модели"
 ]
 
-for user in users:
-    print(user)
+for item in summary:
+    print("-", item)
 
-assert len(users) == 4
-
-
-filtered_items = []
-
-for user in users:
-    if user["city"] == "Казань" and user["status"] == "blocked":
-        filtered_items.append(user)
-
-print(filtered_items)
-
-assert len(filtered_items) >= 1
-
-
-sorted_users = sorted(users, key=lambda x: x["id"])
-
-print(sorted_users)
-
-assert len(sorted_users) == 4
-assert sorted_users[0]["id"] < sorted_users[-1]["id"]
-
-
-items = [1, 2, 3, 2, 4, 5, 3, 6, 1]
-
-unique_values = set(items)
-
-print("Уникальные значения:", unique_values)
-
-assert len(unique_values) >= 2
-
-
-users = [
-    {"name": "Галя", "city": "Самара", "id": 20, "status": "new", "rating": 4.5},
-    {"name": "Петр", "city": "Москва", "id": 21, "status": "active", "rating": 3.8},
-    {"name": "Ольга", "city": "Казань", "id": 22, "status": "blocked", "rating": 4.9},
-    {"name": "Иван", "city": "Уфа", "id": 23, "status": "active", "rating": 3.2}
-]
-
-filtered = [user for user in users if user["status"] == "active"]
-
-sorted_users = sorted(filtered, key=lambda x: x["id"], reverse=True)
-
-best = sorted_users[0] if sorted_users else None
-
-print("Лучший результат:", best)
-
-assert best is not None
-assert best["rating"] >= 3.2
+assert len(summary) == 5
 
 
