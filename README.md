@@ -90,3 +90,23 @@ records = get_all_records(connection)
 print(readme_text)
 assert "sqlite3" in readme_text or "SQLite" in readme_text
 
+
+## Блок 3. Основы математики и информатики
+
+Модуль `src/math/` содержит реализацию итогового мини-проекта по математике:
+
+- **functions.py** — все математические функции (линейные, квадратичные, тригонометрические и др.)
+- **derivatives.py** — производные этих функций
+- **optimization.py** — градиентный спуск
+- **visualization.py** — построение графиков
+- **report_utils.py** — сохранение отчётов
+- **report_html.py** — генерация HTML-отчёта с графиками
+- **chat_bot.py** — простой чат-бот по ключевым словам
+- **smart_chat_bot.py** — умный чат-бот с ИИ (через OpenRouter)
+- **math_main.py** — главный файл для запуска всего проекта
+
+### Запуск
+
+```bash
+python -m src.math_main
+
