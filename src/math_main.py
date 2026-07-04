@@ -5,151 +5,170 @@ import matplotlib.pyplot as plt
 print("Библиотеки подключены")
 
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 x = np.linspace(-4, 4, 200)
-y = x ** 2
+
+f = np.ones_like(x) * 7
+df = np.zeros_like(x)
 
 plt.figure(figsize=(7, 4))
-plt.plot(x, y)
+plt.plot(x, f, label="f(x)=7")
+plt.plot(x, df, label="f'(x)=0")
 
-plt.title("Функция y = x²")
+plt.title("Производная константы")
 plt.xlabel("x")
 plt.ylabel("y")
+plt.legend()
 plt.grid(True)
 plt.show()
 
-assert len(x) == len(y)
+assert np.all(df == 0)
 
 
-x_values = [2.8, 2.9, 3.0, 3.1, 3.2]
-y_values = [x ** 2 for x in x_values]
+import numpy as np
+import matplotlib.pyplot as plt
 
-table = pd.DataFrame({
-    "x": x_values,
-    "y = x²": y_values
-})
+x = np.linspace(-4, 4, 200)
 
-table
+f = 3 * x + 2
+df = np.ones_like(x) * 3
+
+plt.figure(figsize=(7, 4))
+plt.plot(x, f, label="f(x)=3x+2")
+plt.plot(x, df, label="f'(x)=3")
+
+plt.title("Производная линейной функции")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+assert df[0] == 3
 
 
-def f(x):
-    return x ** 2
+x = np.linspace(-4, 4, 200)
 
-x0 = 3
-h = 0.001
+f = x ** 2
+df = 2 * x
 
-derivative = (f(x0 + h) - f(x0)) / h
+plt.figure(figsize=(7, 4))
+plt.plot(x, f, label="f(x)=x²")
+plt.plot(x, df, label="f'(x)=2x")
 
-print("Приближённая производная в x=3:", derivative)
+plt.title("Производная функции x²")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
 
-assert derivative > 5.9
-assert derivative < 6.1
+assert len(f) == len(df)
 
-def numerical_derivative(func, x, h=0.001):
-    return (func(x + h) - func(x)) / h
+
+x = np.linspace(-4, 4, 200)
+
+f = x ** 3
+df = 3 * x ** 2
+
+plt.figure(figsize=(7, 4))
+plt.plot(x, f, label="f(x)=x³")
+plt.plot(x, df, label="f'(x)=3x²")
+
+plt.title("Производная функции x³")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+assert np.min(df) >= 0
+
+
+x = np.linspace(-4, 4, 200)
+
+f = 4 * x ** 2
+df = 8 * x
+
+plt.figure(figsize=(7, 4))
+plt.plot(x, f, label="f(x)=4x²")
+plt.plot(x, df, label="f'(x)=8x")
+
+plt.title("Производная функции с коэффициентом")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+assert len(f) == len(df)
+
+
+x = np.linspace(-4, 4, 200)
+
+f = x ** 2 + 3 * x
+df = 2 * x + 3
+
+plt.figure(figsize=(7, 4))
+plt.plot(x, f, label="f(x)=x²+3x")
+plt.plot(x, df, label="f'(x)=2x+3")
+
+plt.title("Производная суммы")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+assert len(f) == len(df)
+
 
 points = [-3, -2, -1, 0, 1, 2, 3]
 
-derivatives = [numerical_derivative(f, point) for point in points]
+f_values = [x ** 2 + 3 * x for x in points]
+df_values = [2 * x + 3 for x in points]
 
 table = pd.DataFrame({
     "x": points,
-    "приближённая производная": derivatives,
-    "точная производная 2x": [2 * point for point in points]
+    "f(x)=x²+3x": f_values,
+    "f'(x)=2x+3": df_values
 })
 
 table
 
 
-x = np.linspace(-4, 4, 200)
 
-y = x ** 2
-dy = 2 * x
+points = [-3, -2, -1, 0, 1, 2, 3]
 
-plt.figure(figsize=(7, 4))
-plt.plot(x, y, label="y = x²")
-plt.plot(x, dy, label="y' = 2x")
+for x in points:
+    derivative = 2 * x + 3
 
-plt.title("Функция и производная")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-
-
-x = np.linspace(-1, 5, 300)
-
-def f(x):
-    return x ** 2
-
-x0 = 3
-y0 = f(x0)
-slope = 2 * x0
-
-tangent = slope * (x - x0) + y0
-
-plt.figure(figsize=(8, 5))
-plt.plot(x, f(x), label="y = x²")
-plt.plot(x, tangent, label="касательная в x=3")
-plt.scatter([x0], [y0], label="точка касания")
-
-plt.title("Касательная к графику")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-assert slope == 6
-
-
-x_points = [-3, -2, -1, 0, 1, 2, 3]
-
-for point in x_points:
-    derivative_value = 2 * point
-
-    if derivative_value > 0:
+    if derivative > 0:
         message = "функция растёт"
-    elif derivative_value < 0:
+    elif derivative < 0:
         message = "функция убывает"
     else:
-        message = "точка минимума или горизонтальная касательная"
+        message = "возможная точка экстремума"
 
-    print("x =", point, "| производная =", derivative_value, "|", message)
-
-
-    x = np.linspace(-4, 4, 200)
-
-loss = x ** 2
-gradient = 2 * x
-
-plt.figure(figsize=(8, 5))
-plt.plot(x, loss, label="loss = x²")
-plt.plot(x, gradient, label="gradient = 2x")
-plt.scatter([0], [0], label="минимум ошибки")
-
-plt.title("Ошибка модели и производная")
-plt.xlabel("параметр модели")
-plt.ylabel("значение")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-assert min(loss) >= 0
+    print("x =", x, "| f'(x) =", derivative, "|", message)
 
 
-
-summary = [
-    "Производная показывает скорость изменения функции",
-    "Производная связана с наклоном касательной",
-    "Численную производную можно посчитать через маленький шаг h",
-    "Если производная положительная, функция растёт",
-    "Производная нужна для оптимизации и обучения AI-моделей"
+    rules = [
+    "Производная константы равна 0",
+    "Производная x равна 1",
+    "Производная x² равна 2x",
+    "Производная x³ равна 3x²",
+    "Производная суммы равна сумме производных",
+    "Производная помогает понять рост и убывание функции"
 ]
 
-for item in summary:
-    print("-", item)
+for rule in rules:
+    print("-", rule)
 
-assert len(summary) == 5
+assert len(rules) == 6
+
+
+
 
