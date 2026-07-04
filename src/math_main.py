@@ -4,142 +4,149 @@ import matplotlib.pyplot as plt
 
 print("Библиотеки подключены")
 
-x_values = [2.9, 2.99, 2.999, 3.0, 3.001, 3.01, 3.1]
-
-f_values = [x for x in x_values]
-g_values = [3 * x for x in x_values]
-h_values = [f + g for f, g in zip(f_values, g_values)]
-
-table = pd.DataFrame({
-    "x": x_values,
-    "f(x)=x": f_values,
-    "g(x)=3x": g_values,
-    "h(x)=f(x)+g(x)": h_values
-})
-
-table
-
-x = np.linspace(-7, 7, 100)
-
-f = x
-g = 3 * x
-h = f + g
+x = np.linspace(-4, 4, 200)
+y = x ** 2
 
 plt.figure(figsize=(7, 4))
-plt.plot(x, f, label="f(x)=x")
-plt.plot(x, g, label="g(x)=3x")
-plt.plot(x, h, label="h(x)=f(x)+g(x)=3x")
-plt.scatter([2], [6], label="x=2, h=6")
-
-plt.title("Предел суммы функций")
+plt.plot(x, y)
+plt.title("Непрерывная функция y = x²")
 plt.xlabel("x")
 plt.ylabel("y")
-plt.legend()
 plt.grid(True)
 plt.show()
 
-assert h[0] == f[0] + g[0]
+assert len(x) == len(y)
+
+x = np.linspace(-2 * np.pi, 2 * np.pi, 300)
+y = np.cos(x)
+
+plt.figure(figsize=(7, 4))
+plt.plot(x, y)
+plt.title("Непрерывная функция y = cos(x)")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.grid(True)
+plt.show()
+
+assert np.max(y) <= 1.01
+assert np.min(y) >= -1.01
 
 
-x_values = [1.9, 1.99, 1.999, 2.0, 2.001, 2.01, 2.1]
+x_left = np.linspace(-5, -0.1, 300)
+x_right = np.linspace(0.1, 5, 300)
 
-f_values = [x for x in x_values]
-g_values = [x + 2 for x in x_values]
-h_values = [f * g for f, g in zip(f_values, g_values)]
-
-table = pd.DataFrame({
-    "x": x_values,
-    "f(x)=x": f_values,
-    "g(x)=x+2": g_values,
-    "h(x)=f(x)*g(x)": h_values
-})
-
-table
-
-
-x_values = [0.5, 0.9, 0.99, 1.0, 1.01, 1.1, 1.5]
-
-y_values = [(3 * x) / x for x in x_values]
-
-table = pd.DataFrame({
-    "x": x_values,
-    "y=(3x)/x": y_values
-})
-
-table
-
-
-x_values = [2.5, 2.9, 2.99, 2.999, 3.001, 3.01, 3.1, 3.5]
-
-y_values = []
-
-for x in x_values:
-    y = (x ** 2 - 4) / (x - 2)
-    y_values.append(y)
-
-table = pd.DataFrame({
-    "x": x_values,
-    "y": y_values
-})
-
-table
-
-
-x_left = np.linspace(-1, 2.99, 200)
-x_right = np.linspace(3.01, 6, 200)
-
-y_left = (x_left**2 - 9) / (x_left - 3)
-y_right = (x_right**2 - 9) / (x_right - 3)
+y_left = 1 / x_left
+y_right = 1 / x_right
 
 plt.figure(figsize=(7, 4))
 plt.plot(x_left, y_left)
 plt.plot(x_right, y_right)
-plt.scatter([3], [6], facecolors="none", edgecolors="black", label="предел = 6")
 
-plt.title("Неопределённость 0/0 и предел")
+plt.title("Функция с разрывом y = 1/x")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.grid(True)
+plt.show()
+
+
+x_values = [-0.1, -0.2, -0.1, -0.04, 0.01, 0.1, 0.2, 1]
+
+y_values = [1 / x for x in x_values]
+
+table = pd.DataFrame({
+    "x": x_values,
+    "y = 1/x": y_values
+})
+
+table
+
+x_left = np.linspace(-2, 1.99, 200)
+x_right = np.linspace(2.01, 5, 200)
+
+y_left = (x_left ** 2 - 4) / (x_left - 2)
+y_right = (x_right ** 2 - 4) / (x_right - 2)
+
+plt.figure(figsize=(7, 4))
+plt.plot(x_left, y_left)
+plt.plot(x_right, y_right)
+plt.scatter([2], [4], facecolors="none", edgecolors="black", label="дырка")
+
+plt.title("Функция с дыркой")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.legend()
 plt.grid(True)
 plt.show()
 
-x_values = [2.9, 2.99, 3.01, 3.1]
+x = np.linspace(-5, 5, 300)
 
-original_values = [(x ** 2 - 9) / (x - 3) for x in x_values]
-simple_values = [x + 3 for x in x_values]
+y = []
 
-table = pd.DataFrame({
-    "x": x_values,
-    "исходная функция": original_values,
-    "упрощённая x+2": simple_values
-})
-
-table
-
-
-epochs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-metric = [0.55, 0.68, 0.78, 0.85, 0.90, 0.93, 0.95, 0.96, 0.965, 0.968]
+for value in x:
+    if value < 1:
+        y.append(0)
+    else:
+        y.append(2)
 
 plt.figure(figsize=(7, 4))
-plt.plot(epochs, metric, marker="o")
-plt.axhline(0.97, linestyle="--", label="возможный предел 0.97")
+plt.plot(x, y)
+plt.title("Функция со скачком")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.grid(True)
+plt.show()
 
-plt.title("Метрика модели приближается к пределу")
-plt.xlabel("Эпоха")
-plt.ylabel("Accuracy")
+assert min(y) == 0
+assert max(y) == 2
+
+
+x = np.linspace(-5, 5, 300)
+
+y_smooth = x ** 2
+
+y_jump = []
+for value in x:
+    if value < 0:
+        y_jump.append(-1)
+    else:
+        y_jump.append(1)
+
+plt.figure(figsize=(7, 4))
+plt.plot(x, y_smooth, label="непрерывная: x²")
+plt.plot(x, y_jump, label="разрывная: скачок")
+
+plt.title("Сравнение непрерывной и разрывной функции")
+plt.xlabel("x")
+plt.ylabel("y")
 plt.legend()
 plt.grid(True)
 plt.show()
 
-assert metric[-1] > metric[0]
+
+epochs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+smooth_loss = [2.5, 1.8, 1.2, 0.9, 0.7, 0.55, 0.45, 0.38, 0.33, 0.30]
+jump_loss = [2.5, 1.5, 2.0, 0.8, 1.2, 0.6, 0.9, 0.4, 0.5, 0.3]
+
+plt.figure(figsize=(7, 4))
+plt.plot(epochs, smooth_loss, marker="o", label="плавное обучение")
+plt.plot(epochs, jump_loss, marker="s", label="скачки ошибки")
+
+plt.title("Плавное и нестабильное изменение ошибки")
+plt.xlabel("Эпоха")
+plt.ylabel("Loss")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+assert smooth_loss[-1] < smooth_loss[0]
 
 
 summary = [
-    "Предел суммы равен сумме пределов",
-    "Предел произведения равен произведению пределов",
-    "Предел частного можно считать, если знаменатель не стремится к нулю",
-    "Неопределённость 0/0 часто можно упростить",
-    "Пределы помогают понять поведение функций и моделей"
+    "Непрерывную функцию можно представить как плавный график",
+    "Разрыв — это дырка, скачок или обрыв графика",
+    "Функция 1/x имеет разрыв при x=0",
+    "Функции с резкими скачками сложнее анализировать",
+    "Непрерывность важна для производной, оптимизации и AI"
 ]
 
 for item in summary:
