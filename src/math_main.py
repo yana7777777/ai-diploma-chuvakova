@@ -4,12 +4,14 @@ import matplotlib.pyplot as plt
 
 print("Библиотеки подключены")
 
+
 x = np.linspace(-4, 4, 200)
 y = x ** 2
 
 plt.figure(figsize=(7, 4))
 plt.plot(x, y)
-plt.title("Непрерывная функция y = x²")
+
+plt.title("Функция y = x²")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.grid(True)
@@ -17,141 +19,137 @@ plt.show()
 
 assert len(x) == len(y)
 
-x = np.linspace(-2 * np.pi, 2 * np.pi, 300)
-y = np.cos(x)
 
-plt.figure(figsize=(7, 4))
-plt.plot(x, y)
-plt.title("Непрерывная функция y = cos(x)")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
-
-assert np.max(y) <= 1.01
-assert np.min(y) >= -1.01
-
-
-x_left = np.linspace(-5, -0.1, 300)
-x_right = np.linspace(0.1, 5, 300)
-
-y_left = 1 / x_left
-y_right = 1 / x_right
-
-plt.figure(figsize=(7, 4))
-plt.plot(x_left, y_left)
-plt.plot(x_right, y_right)
-
-plt.title("Функция с разрывом y = 1/x")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
-
-
-x_values = [-0.1, -0.2, -0.1, -0.04, 0.01, 0.1, 0.2, 1]
-
-y_values = [1 / x for x in x_values]
+x_values = [2.8, 2.9, 3.0, 3.1, 3.2]
+y_values = [x ** 2 for x in x_values]
 
 table = pd.DataFrame({
     "x": x_values,
-    "y = 1/x": y_values
+    "y = x²": y_values
 })
 
 table
 
-x_left = np.linspace(-2, 1.99, 200)
-x_right = np.linspace(2.01, 5, 200)
 
-y_left = (x_left ** 2 - 4) / (x_left - 2)
-y_right = (x_right ** 2 - 4) / (x_right - 2)
+def f(x):
+    return x ** 2
+
+x0 = 3
+h = 0.001
+
+derivative = (f(x0 + h) - f(x0)) / h
+
+print("Приближённая производная в x=3:", derivative)
+
+assert derivative > 5.9
+assert derivative < 6.1
+
+def numerical_derivative(func, x, h=0.001):
+    return (func(x + h) - func(x)) / h
+
+points = [-3, -2, -1, 0, 1, 2, 3]
+
+derivatives = [numerical_derivative(f, point) for point in points]
+
+table = pd.DataFrame({
+    "x": points,
+    "приближённая производная": derivatives,
+    "точная производная 2x": [2 * point for point in points]
+})
+
+table
+
+
+x = np.linspace(-4, 4, 200)
+
+y = x ** 2
+dy = 2 * x
 
 plt.figure(figsize=(7, 4))
-plt.plot(x_left, y_left)
-plt.plot(x_right, y_right)
-plt.scatter([2], [4], facecolors="none", edgecolors="black", label="дырка")
+plt.plot(x, y, label="y = x²")
+plt.plot(x, dy, label="y' = 2x")
 
-plt.title("Функция с дыркой")
+plt.title("Функция и производная")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.legend()
 plt.grid(True)
 plt.show()
 
-x = np.linspace(-5, 5, 300)
 
-y = []
 
-for value in x:
-    if value < 1:
-        y.append(0)
+x = np.linspace(-1, 5, 300)
+
+def f(x):
+    return x ** 2
+
+x0 = 3
+y0 = f(x0)
+slope = 2 * x0
+
+tangent = slope * (x - x0) + y0
+
+plt.figure(figsize=(8, 5))
+plt.plot(x, f(x), label="y = x²")
+plt.plot(x, tangent, label="касательная в x=3")
+plt.scatter([x0], [y0], label="точка касания")
+
+plt.title("Касательная к графику")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+assert slope == 6
+
+
+x_points = [-3, -2, -1, 0, 1, 2, 3]
+
+for point in x_points:
+    derivative_value = 2 * point
+
+    if derivative_value > 0:
+        message = "функция растёт"
+    elif derivative_value < 0:
+        message = "функция убывает"
     else:
-        y.append(2)
+        message = "точка минимума или горизонтальная касательная"
 
-plt.figure(figsize=(7, 4))
-plt.plot(x, y)
-plt.title("Функция со скачком")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
-
-assert min(y) == 0
-assert max(y) == 2
+    print("x =", point, "| производная =", derivative_value, "|", message)
 
 
-x = np.linspace(-5, 5, 300)
+    x = np.linspace(-4, 4, 200)
 
-y_smooth = x ** 2
+loss = x ** 2
+gradient = 2 * x
 
-y_jump = []
-for value in x:
-    if value < 0:
-        y_jump.append(-1)
-    else:
-        y_jump.append(1)
+plt.figure(figsize=(8, 5))
+plt.plot(x, loss, label="loss = x²")
+plt.plot(x, gradient, label="gradient = 2x")
+plt.scatter([0], [0], label="минимум ошибки")
 
-plt.figure(figsize=(7, 4))
-plt.plot(x, y_smooth, label="непрерывная: x²")
-plt.plot(x, y_jump, label="разрывная: скачок")
-
-plt.title("Сравнение непрерывной и разрывной функции")
-plt.xlabel("x")
-plt.ylabel("y")
+plt.title("Ошибка модели и производная")
+plt.xlabel("параметр модели")
+plt.ylabel("значение")
 plt.legend()
 plt.grid(True)
 plt.show()
 
+assert min(loss) >= 0
 
-epochs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-smooth_loss = [2.5, 1.8, 1.2, 0.9, 0.7, 0.55, 0.45, 0.38, 0.33, 0.30]
-jump_loss = [2.5, 1.5, 2.0, 0.8, 1.2, 0.6, 0.9, 0.4, 0.5, 0.3]
-
-plt.figure(figsize=(7, 4))
-plt.plot(epochs, smooth_loss, marker="o", label="плавное обучение")
-plt.plot(epochs, jump_loss, marker="s", label="скачки ошибки")
-
-plt.title("Плавное и нестабильное изменение ошибки")
-plt.xlabel("Эпоха")
-plt.ylabel("Loss")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-assert smooth_loss[-1] < smooth_loss[0]
 
 
 summary = [
-    "Непрерывную функцию можно представить как плавный график",
-    "Разрыв — это дырка, скачок или обрыв графика",
-    "Функция 1/x имеет разрыв при x=0",
-    "Функции с резкими скачками сложнее анализировать",
-    "Непрерывность важна для производной, оптимизации и AI"
+    "Производная показывает скорость изменения функции",
+    "Производная связана с наклоном касательной",
+    "Численную производную можно посчитать через маленький шаг h",
+    "Если производная положительная, функция растёт",
+    "Производная нужна для оптимизации и обучения AI-моделей"
 ]
 
 for item in summary:
     print("-", item)
 
 assert len(summary) == 5
-
 
