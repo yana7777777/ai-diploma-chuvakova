@@ -4,82 +4,72 @@ import matplotlib.pyplot as plt
 
 print("Библиотеки подключены")
 
-x_values = [1.5, 1.9, 1.99, 2.0, 2.01, 2.1, 2.5]
+x_values = [2.9, 2.99, 2.999, 3.0, 3.001, 3.01, 3.1]
 
-y_values = []
-
-for x in x_values:
-    y_values.append(3 * x)
-
-table = pd.DataFrame({
-    "x": x_values,
-    "y = 3x": y_values
-})
-
-table
-
-x = np.linspace(0, 6, 100)
-y = 3 * x
-
-plt.figure(figsize=(7, 4))
-plt.plot(x, y, label="y = 3x")
-plt.scatter([2], [6], label="точка x=2, y=6")
-
-plt.title("Предел на примере y = 3x")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.legend()
-plt.show()
-
-assert 3 * 2 == 6
-
-
-left_x = [1.9, 1.99, 1.999]
-right_x = [2.1, 2.01, 2.001]
-
-left_y = [2 * x for x in left_x]
-right_y = [2 * x for x in right_x]
-
-table = pd.DataFrame({
-    "x слева": left_x,
-    "y слева": left_y,
-    "x справа": right_x,
-    "y справа": right_y
-})
-
-table
-
-
-x_values = [2.5, 2.9, 2.99, 3.0, 3.01, 3.1, 3.5]
-y_values = [x ** 2 for x in x_values]
+f_values = [x for x in x_values]
+g_values = [3 * x for x in x_values]
+h_values = [f + g for f, g in zip(f_values, g_values)]
 
 table = pd.DataFrame({
     "x": x_values,
-    "y = x²": y_values
+    "f(x)=x": f_values,
+    "g(x)=3x": g_values,
+    "h(x)=f(x)+g(x)": h_values
+})
+
+table
+
+x = np.linspace(-7, 7, 100)
+
+f = x
+g = 3 * x
+h = f + g
+
+plt.figure(figsize=(7, 4))
+plt.plot(x, f, label="f(x)=x")
+plt.plot(x, g, label="g(x)=3x")
+plt.plot(x, h, label="h(x)=f(x)+g(x)=3x")
+plt.scatter([2], [6], label="x=2, h=6")
+
+plt.title("Предел суммы функций")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+assert h[0] == f[0] + g[0]
+
+
+x_values = [1.9, 1.99, 1.999, 2.0, 2.001, 2.01, 2.1]
+
+f_values = [x for x in x_values]
+g_values = [x + 2 for x in x_values]
+h_values = [f * g for f, g in zip(f_values, g_values)]
+
+table = pd.DataFrame({
+    "x": x_values,
+    "f(x)=x": f_values,
+    "g(x)=x+2": g_values,
+    "h(x)=f(x)*g(x)": h_values
 })
 
 table
 
 
-x = np.linspace(-1, 5, 200)
-y = x ** 2
+x_values = [0.5, 0.9, 0.99, 1.0, 1.01, 1.1, 1.5]
 
-plt.figure(figsize=(7, 4))
-plt.plot(x, y, label="y = x²")
-plt.scatter([3], [9], label="x=3, y=9")
+y_values = [(3 * x) / x for x in x_values]
 
-plt.title("Предел на примере y = x²")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.legend()
-plt.show()
+table = pd.DataFrame({
+    "x": x_values,
+    "y=(3x)/x": y_values
+})
 
-assert 3 ** 2 == 9
+table
 
 
-x_values = [0.7, 0.9, 0.99, 0.999, 1.003, 1.03, 1.3, 1.8]
+x_values = [2.5, 2.9, 2.99, 2.999, 3.001, 3.01, 3.1, 3.5]
 
 y_values = []
 
@@ -95,46 +85,61 @@ table = pd.DataFrame({
 table
 
 
-x_left = np.linspace(-1, 1.99, 100)
-x_right = np.linspace(2.01, 4, 100)
+x_left = np.linspace(-1, 2.99, 200)
+x_right = np.linspace(3.01, 6, 200)
 
-y_left = (x_left ** 2 - 4) / (x_left - 2)
-y_right = (x_right ** 2 - 4) / (x_right - 2)
+y_left = (x_left**2 - 9) / (x_left - 3)
+y_right = (x_right**2 - 9) / (x_right - 3)
 
 plt.figure(figsize=(7, 4))
 plt.plot(x_left, y_left)
 plt.plot(x_right, y_right)
-plt.scatter([2], [4], facecolors='none', edgecolors='black', label="предел = 4")
+plt.scatter([3], [6], facecolors="none", edgecolors="black", label="предел = 6")
 
-plt.title("Функция не определена в x=2, но предел есть")
+plt.title("Неопределённость 0/0 и предел")
 plt.xlabel("x")
 plt.ylabel("y")
-plt.grid(True)
 plt.legend()
+plt.grid(True)
 plt.show()
+
+x_values = [2.9, 2.99, 3.01, 3.1]
+
+original_values = [(x ** 2 - 9) / (x - 3) for x in x_values]
+simple_values = [x + 3 for x in x_values]
+
+table = pd.DataFrame({
+    "x": x_values,
+    "исходная функция": original_values,
+    "упрощённая x+2": simple_values
+})
+
+table
 
 
 epochs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-loss = [0.9, 0.75, 0.6, 0.48, 0.38, 0.30, 0.23, 0.18, 0.14, 0.10]
+metric = [0.55, 0.68, 0.78, 0.85, 0.90, 0.93, 0.95, 0.96, 0.965, 0.968]
 
 plt.figure(figsize=(7, 4))
-plt.plot(epochs, loss, marker='o', linestyle='-')
+plt.plot(epochs, metric, marker="o")
+plt.axhline(0.97, linestyle="--", label="возможный предел 0.97")
 
-plt.title("Ошибка модели стремится к 0")
+plt.title("Метрика модели приближается к пределу")
 plt.xlabel("Эпоха")
-plt.ylabel("Loss")
+plt.ylabel("Accuracy")
+plt.legend()
 plt.grid(True)
 plt.show()
 
-assert loss[-1] < loss[0]
+assert metric[-1] > metric[0]
 
 
 summary = [
-    "Предел показывает, к чему стремится функция",
-    "К точке можно приближаться слева и справа",
-    "Функция может иметь предел, даже если не определена в точке",
-    "Пределы нужны для понимания производной и оптимизации",
-    "В AI идея предела связана с уменьшением ошибки модели"
+    "Предел суммы равен сумме пределов",
+    "Предел произведения равен произведению пределов",
+    "Предел частного можно считать, если знаменатель не стремится к нулю",
+    "Неопределённость 0/0 часто можно упростить",
+    "Пределы помогают понять поведение функций и моделей"
 ]
 
 for item in summary:
